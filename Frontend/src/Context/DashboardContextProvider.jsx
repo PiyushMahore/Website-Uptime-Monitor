@@ -44,8 +44,19 @@ export const DashboardContextProvider = (props) => {
         }
     }
 
+    const fetchUrl = async (url) => {
+        try {
+            const response = await axios.post('http://localhost:3000/api/v1/webUrls/fetch-url', {
+                url // send the url as a query parameter
+            })
+            return response.data
+        } catch (error) {
+            console.log("somthing went wrong while fetching url", error)
+        }
+    }
+
     return (
-        <dashboardContext.Provider value={{ addUrl, allUrls, deleteUrl }}>
+        <dashboardContext.Provider value={{ addUrl, allUrls, deleteUrl, fetchUrl }}>
             {props.children}
         </dashboardContext.Provider>
     )

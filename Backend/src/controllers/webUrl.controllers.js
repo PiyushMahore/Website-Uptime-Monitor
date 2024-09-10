@@ -3,6 +3,7 @@ import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import { WebUrl } from "../models/webUrl.model.js";
 import mongoose from "mongoose";
+import axios from 'axios';
 
 const addWebUrl = asyncHandler(async(req, res) => {
     const { url } = req.body
@@ -95,6 +96,30 @@ const editUrl = asyncHandler(async(req, res) => {
     .json(new apiResponse(200, urlExist, "Url Updated successfully"))
 })
 
+const fetchUrl = asyncHandler(async(req, res) => {
+    const {url} = req.body
+
+    if(!url) {
+        throw new apiError(404, "url field is empty")
+    }
+    
+    try {
+        const response = await axios.get(url)
+        const urlDescription = await WebUrl.find({"Urls": url})
+        if (response.status >= 500) {
+            return res
+            .status(200)
+            .json(new apiResponse(200, {URL: urlDescription || url}, "Url fetched sucessfully"))
+        }
+        return res
+        .status(200)
+        .json(new apiResponse(200, null, "Url fetched sucessfully"))
+
+    } catch (error) {
+        throw new apiError(500, "Unable to fetch api", error)
+    }
+})
+
 const getAllUrls = asyncHandler(async(req, res) => {
     const urls = await WebUrl.aggregate([
         {
@@ -134,4 +159,4 @@ const getAllUrls = asyncHandler(async(req, res) => {
     .json(new apiResponse(200, urls, "All web urls fetched successfully"))
 })
 
-export {addWebUrl, deleteUrl, editUrl, getAllUrls}
+export {addWebUrl, deleteUrl, editUrl, getAllUrls, fetchUrl}

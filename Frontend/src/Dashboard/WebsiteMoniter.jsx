@@ -19,9 +19,29 @@ function WebsiteMoniter() {
         setAllUrls(useDashboard.allUrls)
     }, [useDashboard])
 
+    const fetching = async () => {
+        if (allUrls.length > 0) {
+            const responses = allUrls.map(async (data) => {
+                const text = await useDashboard.fetchUrl(data.Urls)
+                if (text !== null) {
+                    console.log(text);
+                }
+            })
+        }
+    }
+
+    // setInterval(() => {
+    //     if (allUrls.length > 0) {
+    //         const responses = allUrls.map(async (data) => (await useDashboard.fetchUrl(data)))
+    //         if (responses !== null) {
+    //             console.log(responses);
+    //         }
+    //     }
+    // }, 180000);
+
     return (
         <div className={`min-h-screen sm:px-[10%] sm:pt-[5%] px-4 py-4 bg-[#222838] relative`}>
-            <div className={`flex justify-start ${addUrlForm ? "blur-sm" : ""}`}>
+            <div className={`flex justify-start ${addUrlForm || deleteForm ? "blur-sm" : ""}`}>
                 <div className='flex sm:gap-16 gap-6 flex-wrap'>
                     <h1 className='sm:text-3xl text-xl font-bold'>How has your day been so far, Piyush ?</h1>
                     <div className='flex flex-col sm:flex-row justify-start gap-6 items-start sm:items-center'>
@@ -30,6 +50,7 @@ function WebsiteMoniter() {
                             <input placeholder='Search' className='pl-8 h-8 w-72 rounded-lg focus:outline-none border border-gray-500 inputShadow bg-[#222838] text-white' type="search" />
                         </div>
                         <button onClick={() => setAddUrlForm(true)} className='bg-[#5B63D3] rounded-lg hover:bg-[#3788d8] px-4 py-1.5'>Create monitor</button>
+                        <button onClick={fetching}>Heeeeee</button>
                     </div>
                 </div>
             </div>
