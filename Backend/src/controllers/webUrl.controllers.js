@@ -115,14 +115,25 @@ const fetchUrl = asyncHandler(async (req, res) => {
         .json(
           new apiResponse(
             200,
-            { URL: urlDescription || url },
-            "Url fetched sucessfully"
+            {
+              URL: urlDescription,
+              statusCode: response.status
+            },
+            `Website is down with status code of ${response.status}`
           )
         );
     }
     return res
       .status(200)
-      .json(new apiResponse(200, null, "Url fetched sucessfully"));
+      .json(new apiResponse(
+        200,
+        {
+          URL: urlDescription,
+          statusCode: response.status
+        },
+        `Website is Perfectly working with status code ${response.status}`
+      ));
+
   } catch (error) {
     throw new apiError(500, "Unable to fetch api", error);
   }
