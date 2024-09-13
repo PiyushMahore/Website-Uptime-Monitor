@@ -24,7 +24,7 @@ function SignUp() {
     const handleSignUp = async () => {
         const data = await useContexts.signUp(fullName, userName, email, password, mobileNumber, coverImage || "");
         if (data) {
-            navigate("/dashboard");
+            navigate(`/dashboard/${data.data._id}`)
         }
     };
 

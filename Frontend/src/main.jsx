@@ -17,7 +17,7 @@ const router = createBrowserRouter([
     element: <App />
   },
   {
-    path: "/dashboard",
+    path: "/dashboard/:id",
     element: <WebsiteMoniter />
   },
   {

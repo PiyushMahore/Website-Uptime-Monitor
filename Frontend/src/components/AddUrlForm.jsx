@@ -4,10 +4,12 @@ import { useDashboardContext } from '../Context/DashboardContextProvider';
 
 function AddUrlForm({ toggleForm }) {
     const useDashboard = useDashboardContext()
+
     const [url, setUrl] = useState("")
     const addUrl = async () => {
         await useDashboard.addUrl(url)
         toggleForm(false)
+        window.location.reload()
     }
 
     return (

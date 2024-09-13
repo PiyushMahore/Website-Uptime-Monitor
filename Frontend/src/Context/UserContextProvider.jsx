@@ -65,7 +65,6 @@ export const UserContextProvider = (props) => {
             return response.data;
         } catch (error) {
             console.log('Erro While getting user', error)
-            return null;
         }
     }
 

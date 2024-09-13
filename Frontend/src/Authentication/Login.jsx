@@ -20,7 +20,7 @@ function Login() {
     const logIn = async () => {
         const data = await useContexts.login(email, password)
         if (data) {
-            navigate("/dashboard")
+            navigate(`/dashboard/${data.data._id}`)
         }
     }
 

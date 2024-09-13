@@ -1,7 +1,7 @@
 import React from 'react'
 import { useDashboardContext } from '../Context/DashboardContextProvider'
 
-function DeleteUrlMenu({ cancel, url, className }) {
+function DeleteUrlMenu({ cancel, url }) {
     const useDashboard = useDashboardContext()
 
     return (
@@ -12,6 +12,7 @@ function DeleteUrlMenu({ cancel, url, className }) {
                 <button onClick={() => {
                     useDashboard.deleteUrl(url)
                     cancel(false)
+                    window.location.reload()
                 }} className='py-2 px-3 bg-red-500 rounded-md'>Confirm</button>
             </div>
         </div >

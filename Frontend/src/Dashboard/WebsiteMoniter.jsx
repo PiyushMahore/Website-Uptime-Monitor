@@ -9,6 +9,7 @@ import { useDashboardContext } from '../Context/DashboardContextProvider.jsx';
 
 function WebsiteMoniter() {
     const useDashboard = useDashboardContext()
+
     const [webDisplay, setWebdisplay] = useState(true)
     const [addUrlForm, setAddUrlForm] = useState(false)
     const [deleteForm, setDeleteForm] = useState(false)
@@ -17,27 +18,20 @@ function WebsiteMoniter() {
 
     useEffect(() => {
         setAllUrls(useDashboard.allUrls)
-    }, [useDashboard])
+    }, [useDashboard.allUrls])
 
-    const fetching = async () => {
-        if (allUrls.length > 0) {
-            const responses = allUrls.map(async (data) => {
-                const text = await useDashboard.fetchUrl(data.Urls)
-                if (text !== null) {
-                    console.log(text);
+    useEffect(() => {
+        const fetching = async () => {
+            allUrls.map(async (data) => {
+                const fetching = await useDashboard.fetchUrl(data.Urls)
+                if (fetching.data.statusCode >= 500) {
+                    useDashboard.setNotWorkingUrls((prev) => [...prev, fetching.data.URL[0]])
                 }
             })
         }
-    }
 
-    // setInterval(() => {
-    //     if (allUrls.length > 0) {
-    //         const responses = allUrls.map(async (data) => (await useDashboard.fetchUrl(data)))
-    //         if (responses !== null) {
-    //             console.log(responses);
-    //         }
-    //     }
-    // }, 180000);
+        fetching()
+    }, [allUrls])
 
     return (
         <div className={`min-h-screen sm:px-[10%] sm:pt-[5%] px-4 py-4 bg-[#222838] relative`}>
@@ -50,7 +44,6 @@ function WebsiteMoniter() {
                             <input placeholder='Search' className='pl-8 h-8 w-72 rounded-lg focus:outline-none border border-gray-500 inputShadow bg-[#222838] text-white' type="search" />
                         </div>
                         <button onClick={() => setAddUrlForm(true)} className='bg-[#5B63D3] rounded-lg hover:bg-[#3788d8] px-4 py-1.5'>Create monitor</button>
-                        <button onClick={fetching}>Heeeeee</button>
                     </div>
                 </div>
             </div>
@@ -62,17 +55,16 @@ function WebsiteMoniter() {
                     <span className={`flex items-center gap-2 px-5 py-2 border border-gray-500 rounded-md ${webDisplay ? "rounded-b-none" : ""}`}><MdArrowForwardIos onClick={() => setWebdisplay(!webDisplay)} className={`${webDisplay ? "rotate-90" : ""} duration-300`} /> Moniter</span>
 
                     <div className='rounded-b-lg overflow-hidden bg-[#2F3647]'>
-                        {/* Add here */}
                         {
                             allUrls && allUrls.map((data) => (
                                 <span key={data._id}>
                                     <div className='pl-12 py-3'>
                                         <div className='flex items-center justify-between sm:pr-24'>
                                             <div className='flex items-center gap-7'>
-                                                <div className='w-2.5 h-2.5 bg-green-400 rounded-full'></div>
+                                                <div className={`w-2.5 h-2.5 ${useDashboard.notWorkingUrls?.find((id) => id._id === data._id) ? "bg-red-600" : "bg-green-400"} rounded-full`}></div>
                                                 <div className='text-sm'>
                                                     <p className='font-bold break-words w-60 sm:w-[550px] 2xl:w-full'>{data.Urls}</p>
-                                                    <p className='text-green-600'>Up <span className='text-gray-400'>· 8d 51m </span></p>
+                                                    <p className='text-green-600'>Up<span className='text-gray-400 ml-2 text-xs'>{`· ${data.createdAt.slice(0, 10)}`}</span></p>
                                                 </div>
                                             </div>
                                             <div className='sm:flex hidden items-center gap-12'>

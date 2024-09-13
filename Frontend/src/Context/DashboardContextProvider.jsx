@@ -4,6 +4,7 @@ import axios from "axios";
 const dashboardContext = createContext()
 
 export const DashboardContextProvider = (props) => {
+    const [notWorkingUrls, setNotWorkingUrls] = useState([])
     const [allUrls, setAllUrls] = useState([])
 
     const addUrl = async (Url) => {
@@ -13,24 +14,25 @@ export const DashboardContextProvider = (props) => {
             })
             return url.data
         } catch (error) {
+
             console.log("somthing went wrong while adding urls", error)
         }
     }
 
-    useEffect(() => {
-        const getAllUrls = async () => {
-            try {
-                const urls = await axios.get("http://localhost:3000/api/v1/webUrls/get-website-url", {
-                    withCredentials: true, // This ensures cookies are sent with the request
-                })
-                setAllUrls(urls.data.data)
-            } catch (error) {
-                console.log("somthing went wrong while getting urls", error)
-            }
+    const getAllUrls = async () => {
+        try {
+            const urls = await axios.get("http://localhost:3000/api/v1/webUrls/get-website-url", {
+                withCredentials: true, // This ensures cookies are sent with the request
+            })
+            setAllUrls(urls.data.data)
+        } catch (error) {
+            console.log("somthing went wrong while getting urls", error)
         }
+    }
 
+    useEffect(() => {
         getAllUrls()
-    })
+    }, [])
 
     const deleteUrl = async (url) => {
         try {
@@ -56,7 +58,7 @@ export const DashboardContextProvider = (props) => {
     }
 
     return (
-        <dashboardContext.Provider value={{ addUrl, allUrls, deleteUrl, fetchUrl }}>
+        <dashboardContext.Provider value={{ addUrl, allUrls, deleteUrl, fetchUrl, getAllUrls, notWorkingUrls, setNotWorkingUrls }}>
             {props.children}
         </dashboardContext.Provider>
     )
