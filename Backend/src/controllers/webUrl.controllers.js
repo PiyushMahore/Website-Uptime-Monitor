@@ -2,14 +2,16 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import { WebUrl } from "../models/webUrl.model.js";
+import { User } from "../models/user.model.js";
 import mongoose from "mongoose";
 import axios from "axios";
+import mailAlert from "../utils/emailAlert.js"
 
 const addWebUrl = asyncHandler(async (req, res) => {
-  const { url } = req.body;
+  const { url, notificationType } = req.body;
 
-  if (!url) {
-    throw new apiError(400, "Url is needed");
+  if (!url || !notificationType) {
+    throw new apiError(400, "Url & notificationType is needed");
   }
 
   const urlValidation =
@@ -21,7 +23,7 @@ const addWebUrl = asyncHandler(async (req, res) => {
     throw new apiError(401, "Invalid Url");
   }
 
-  const webUrl = await WebUrl.create({ Urls: url, userId: req.user?._id });
+  const webUrl = await WebUrl.create({ Urls: url, notificationType: notificationType, userId: req.user?._id });
 
   if (!webUrl) {
     throw new apiError(
@@ -64,20 +66,17 @@ const deleteUrl = asyncHandler(async (req, res) => {
 });
 
 const editUrl = asyncHandler(async (req, res) => {
-  const { newUrl } = req.body;
+  const { newUrl, newNotificationType } = req.body;
   const { urlId } = req.params;
 
-  if (!urlId || !newUrl) {
-    throw new apiError(400, "url and urlId is not given");
+  if (!newUrl && !newNotificationType) {
+    return res
+      .status(200)
+      .json(new apiResponse(200, {}, "Nothing to update"))
   }
 
-  const urlValidation =
-    /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[a-zA-Z0-9._~:/?#[\]@!$&'()*+,;=%-]*)?$/;
-
-  const validOrNot = urlValidation.test(newUrl);
-
-  if (validOrNot === false) {
-    throw new apiError(401, "Invalid Url");
+  if (!urlId) {
+    throw new apiError(400, "urlId is not given");
   }
 
   const urlExist = await WebUrl.findById(urlId);
@@ -90,7 +89,22 @@ const editUrl = asyncHandler(async (req, res) => {
     throw new apiError(400, "unauthorize request");
   }
 
-  urlExist.Urls = newUrl;
+  if (newUrl) {
+    const urlValidation =
+      /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[a-zA-Z0-9._~:/?#[\]@!$&'()*+,;=%-]*)?$/;
+
+    const validOrNot = urlValidation.test(newUrl);
+
+    if (validOrNot === false) {
+      throw new apiError(401, "Invalid Url");
+    }
+
+    urlExist.Urls = newUrl;
+  }
+
+  if (newNotificationType) {
+    urlExist.notificationType = newNotificationType;
+  }
 
   await urlExist.save({ validateBeforeSave: false });
 
@@ -109,29 +123,15 @@ const fetchUrl = asyncHandler(async (req, res) => {
   try {
     const response = await axios.get(url);
     const urlDescription = await WebUrl.find({ Urls: url });
-    if (response.status >= 500) {
-      return res
-        .status(200)
-        .json(
-          new apiResponse(
-            200,
-            {
-              URL: urlDescription,
-              statusCode: response.status
-            },
-            `Website is down with status code of ${response.status}`
-          )
-        );
-    }
     return res
       .status(200)
       .json(new apiResponse(
         200,
         {
           URL: urlDescription,
-          statusCode: response.status
+          statusCode: 500
         },
-        `Website is Perfectly working with status code ${response.status}`
+        `${response.status < 500 ? "Website is Perfectly working with status code" : "Website is down with status code of"} ${response.status}`
       ));
 
   } catch (error) {
@@ -178,4 +178,31 @@ const getAllUrls = asyncHandler(async (req, res) => {
     .json(new apiResponse(200, urls, "All web urls fetched successfully"));
 });
 
-export { addWebUrl, deleteUrl, editUrl, getAllUrls, fetchUrl };
+const alertSender = asyncHandler(async (req, res) => {
+  const { receiversdata } = req.body;
+
+  if (!receiversdata) {
+    throw new apiError(404, "recervers data not reseved")
+  }
+
+  const user = await User.findById(receiversdata.userId)
+
+  if (!user) {
+    throw new apiError(404, "cant find user from given user Id")
+  }
+
+  if (receiversdata.notificationType === "email") {
+    await mailAlert(user.email)
+  }
+  else if (receiversdata.notificationType === "text") {
+    console.log("text")
+  } else {
+    console.log("call")
+  }
+
+  return res
+    .status(200)
+    .json(new apiResponse(200, {}, "Alert send successfully"))
+})
+
+export { addWebUrl, deleteUrl, editUrl, getAllUrls, fetchUrl, alertSender };

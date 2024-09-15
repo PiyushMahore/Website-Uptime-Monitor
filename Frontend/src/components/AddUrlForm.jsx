@@ -5,9 +5,13 @@ import { useDashboardContext } from '../Context/DashboardContextProvider';
 function AddUrlForm({ toggleForm }) {
     const useDashboard = useDashboardContext()
 
+    const [notificationType, setNotificationType] = useState("")
     const [url, setUrl] = useState("")
     const addUrl = async () => {
-        await useDashboard.addUrl(url)
+        if (notificationType === "") {
+            throw Error("please slect alert option")
+        }
+        await useDashboard.addUrl(url, notificationType)
         toggleForm(false)
         window.location.reload()
     }
@@ -20,6 +24,14 @@ function AddUrlForm({ toggleForm }) {
                 <div>
                     <input value={url} onChange={(e) => setUrl(e.target.value)} className='mt-4 focus:outline-none border border-gray-300 rounded-l-md w-72 lg:w-60 p-1 text-black' type="text" placeholder='Enter Your Website Url' />
                     <button onClick={addUrl} className='bg-red-500 py-[5px] px-4 rounded-r-md text-center hover:scale-110 duration-200'>Add</button>
+                    <form className='mt-3 flex items-center justify-center gap-1'>
+                        <input onChange={(e) => setNotificationType(e.target.value)} className='w-4 h-4' type="radio" value={"email"} name='option' />
+                        <label htmlFor="email">email</label>
+                        <input onChange={(e) => setNotificationType(e.target.value)} className='w-4 h-4' type="radio" value={"text"} name='option' />
+                        <label htmlFor="text">text</label>
+                        <input onChange={(e) => setNotificationType(e.target.value)} className='w-4 h-4' type="radio" value={"call"} name='option' />
+                        <label htmlFor="call">call</label>
+                    </form>
                 </div>
             </div>
         </div>

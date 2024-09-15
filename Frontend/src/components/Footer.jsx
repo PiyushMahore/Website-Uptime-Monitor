@@ -7,7 +7,7 @@ import { FaTwitter } from "react-icons/fa";
 
 function Footer() {
     return (
-        <div className='px-[10%] mt-36 bg-[#05050f] max-w-screen text-gray-400 pt-5 pb-4'>
+        <div className='contact px-[10%] mt-36 bg-[#05050f] max-w-screen text-gray-400 pt-5 pb-4'>
             <div className='pt-4 pb-2 flex justify-between sm:flex-row flex-col mb-2'>
                 <div className='flex flex-col sm:justify-start text-left w-[30%]'>
                     <h1 className='text-2xl font-bold text-white mb-1'>Uptime Moniter</h1>

@@ -7,9 +7,12 @@ export const DashboardContextProvider = (props) => {
     const [notWorkingUrls, setNotWorkingUrls] = useState([])
     const [allUrls, setAllUrls] = useState([])
 
-    const addUrl = async (Url) => {
+    const addUrl = async (Url, notificationType) => {
         try {
-            const url = await axios.post("http://localhost:3000/api/v1/webUrls/add-website-url", { "url": Url }, {
+            const url = await axios.post("http://localhost:3000/api/v1/webUrls/add-website-url", {
+                "url": Url,
+                "notificationType": notificationType
+            }, {
                 withCredentials: true, // Ensure cookies are sent with the request
             })
             return url.data
@@ -57,8 +60,19 @@ export const DashboardContextProvider = (props) => {
         }
     }
 
+    const alertSender = async (userData) => {
+        try {
+            const response = await axios.post('http://localhost:3000/api/v1/webUrls/alert', {
+                receiversdata: userData,
+            })
+            return response.data
+        } catch (error) {
+            console.log("something went wrong sending alert", error)
+        }
+    }
+
     return (
-        <dashboardContext.Provider value={{ addUrl, allUrls, deleteUrl, fetchUrl, getAllUrls, notWorkingUrls, setNotWorkingUrls }}>
+        <dashboardContext.Provider value={{ addUrl, allUrls, deleteUrl, fetchUrl, getAllUrls, notWorkingUrls, setNotWorkingUrls, alertSender }}>
             {props.children}
         </dashboardContext.Provider>
     )

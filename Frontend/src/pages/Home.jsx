@@ -45,7 +45,7 @@ function Home() {
     }, [])
 
     return (
-        <div className='h-screen radial-gradient-custom p-1 text-center'>
+        <div className='home h-screen radial-gradient-custom p-1 text-center'>
             <Navbar />
             <hr className='sm:border border-0 border-gray-200' />
             <div className='flex h-full justify-center items-center flex-col gap-5 animation'>

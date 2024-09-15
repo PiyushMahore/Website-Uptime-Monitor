@@ -2,7 +2,7 @@ import React from 'react'
 
 function Alerts() {
     return (
-        <div className='mt-36 mb-6'>
+        <div className='mt-36 mb-6 about'>
             <div className='flex items-center flex-col animation'>
                 <h6 style={{ backgroundColor: 'rgb(124 135 247 / 0.1)', borderColor: 'rgb(124 135 247 / 0.36)' }} className='px-3 py-1.5 rounded-full border w-fit '>UPTIME MONITERING</h6>
                 <h1 className='sm:text-6xl text-5xl font-semibold '>Incident management <br /> and on-call alerting</h1>

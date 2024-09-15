@@ -1,4 +1,4 @@
-import mongoose, {Schema} from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const webUrlSchema = new Schema(
     {
@@ -6,6 +6,10 @@ const webUrlSchema = new Schema(
             type: String,
             required: true,
             unique: true
+        },
+        notificationType: {
+            type: String,
+            required: true
         },
         userId: {
             type: Schema.Types.ObjectId,

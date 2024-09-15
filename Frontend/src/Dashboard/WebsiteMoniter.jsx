@@ -33,6 +33,18 @@ function WebsiteMoniter() {
         fetching()
     }, [allUrls])
 
+    useEffect(() => {
+        if (useDashboard.notWorkingUrls.length > 0) {
+            useDashboard.notWorkingUrls.map((data) => {
+                useDashboard.alertSender(data, data.notificationType)
+                const pendingNotification = useDashboard.notWorkingUrls.filter((urls) => urls._id !== data._id)
+                useDashboard.setNotWorkingUrls(pendingNotification)
+            })
+        }
+    }, [useDashboard.notWorkingUrls])
+
+    console.log(useDashboard.notWorkingUrls)
+
     return (
         <div className={`min-h-screen sm:px-[10%] sm:pt-[5%] px-4 py-4 bg-[#222838] relative`}>
             <div className={`flex justify-start ${addUrlForm || deleteForm ? "blur-sm" : ""}`}>
