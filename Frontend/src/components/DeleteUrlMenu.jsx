@@ -3,6 +3,7 @@ import { useDashboardContext } from '../Context/DashboardContextProvider'
 
 function DeleteUrlMenu({ cancel, url }) {
     const useDashboard = useDashboardContext()
+    console.log(url)
 
     return (
         <div className={`absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 bg-[#222838] h-44 w-screen sm:w-fit flex justify-center flex-col items-center border border-gray-500 p-2 sm:px-16 rounded-2xl z-20`}>

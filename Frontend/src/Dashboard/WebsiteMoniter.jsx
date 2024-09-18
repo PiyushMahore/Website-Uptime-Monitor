@@ -43,7 +43,7 @@ function WebsiteMoniter() {
         }
     }, [useDashboard.notWorkingUrls])
 
-    console.log(useDashboard.notWorkingUrls)
+    console.log(allUrls)
 
     return (
         <div className={`min-h-screen sm:px-[10%] sm:pt-[5%] px-4 py-4 bg-[#222838] relative`}>
@@ -87,7 +87,7 @@ function WebsiteMoniter() {
                                                 <div>
                                                     <MdDelete onClick={() => {
                                                         setDeleteForm(true)
-                                                        setDatetingUrl(data.Urls)
+                                                        setDatetingUrl(data._id)
                                                     }} cursor={"Pointer"} size={20} color='red' />
                                                 </div>
                                             </div>

@@ -37,10 +37,10 @@ export const DashboardContextProvider = (props) => {
         getAllUrls()
     }, [])
 
-    const deleteUrl = async (url) => {
+    const deleteUrl = async (urlId) => {
         try {
             const response = await axios.delete(`http://localhost:3000/api/v1/webUrls/remove-website-url`, {
-                data: { url: url },
+                data: { urlId },
                 withCredentials: true, // Ensure cookies are sent with the request
             });
             return response.data;

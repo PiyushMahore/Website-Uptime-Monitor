@@ -1,20 +1,30 @@
 import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
 
+dotenv.config()
+
+// Create a transporter object using the Gmail SMTP service
 const transporter = nodemailer.createTransport({
-    service: "gmail", // Use Gmail SMTP service
+    service: 'gmail',
     auth: {
-        user: 'piyushmahore41@gmail.com', // Your email address from env file
-        pass: 'npptpcoodfvwcqeh', // Your email password from env file
+        user: process.env.EMAIL,         // Your email address from the environment file
+        pass: process.env.APP_PASSWORD,  // Your email app password from the environment file
     },
 });
 
 async function mailAlert(receiver) {
-    const info = await transporter.sendMail({
-        from: 'piyushmahore41@gmail.com', // sender address
-        to: receiver, // list of receivers
-        subject: "Your Website is crashed", // Subject line
-        text: "Hello, \n currently your website is not responding.", // plain text body
-    });
+    try {
+        // Send the email
+        await transporter.sendMail({
+            from: process.env.EMAIL, // sender address
+            to: receiver.email,      // recipient's email address
+            subject: 'Website Downtime',  // Subject line
+            text: `Hi ${receiver.fullName},\n\nJust a heads-up, it looks like the website is currently down. Please check and resolve the issue at your earliest convenience.\n\nBest regards,\nUptime Monitor`,  // plain text body
+        });
+
+    } catch (error) {
+        console.error('Error sending email:', error);
+    }
 }
 
 export default mailAlert;

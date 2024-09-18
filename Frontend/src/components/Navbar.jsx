@@ -37,16 +37,16 @@ function Navbar() {
 
             {/* MOBILE */}
             <div className='flex justify-center items-center flex-col sm:hidden overflow-hidden'>
-                <div className={`list-none absolute top-0 left-0 w-screen ${nav ? "translate-y-0" : "-translate-y-[80%]"} transition-transform duration-500 ease-in-out flex items-center flex-col`}>
+                <div className={`list-none absolute top-2 left-0 w-screen ${nav ? "translate-y-0" : "-translate-y-[80%]"} transition-transform duration-500 ease-in-out flex items-center flex-col`}>
                     <ul className='bg-[#7c89e602] text-white mb-1 flex gap-2 flex-col w-screen p-4 z-20'>
                         <Link to='home' spy={true} smooth={true} offset={50} duration={500} className={`relative inline-block ${nav ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300 ease-in-out`}>
-                            <a className="underline underline-offset-8">Home</a>
+                            <div className="underline underline-offset-8">Home</div>
                         </Link>
                         <Link to='about' spy={true} smooth={true} offset={50} duration={800} className={`relative inline-block ${nav ? "translate-x-0" : "-translate-x-full"} transition-transform duration-500 ease-in-out`}>
-                            <a className="underline underline-offset-8">About Us</a>
+                            <div className="underline underline-offset-8">About Us</div>
                         </Link>
-                        <Link to='contact' spy={true} smooth={true} offset={50} duration={900} className={`relative inline-block ${nav ? "translate-x-0" : "-translate-x-full"} transition-transform duration-500 ease-in-out`}>
-                            <a className="underline underline-offset-8">Contact Us</a>
+                        <Link to='contact' spy={true} smooth={true} offset={50} duration={900} className={`relative inline-block ${nav ? "translate-x-0" : "-translate-x-full"} transition-transform duration-700 ease-in-out`}>
+                            <div className="underline underline-offset-8">Contact Us</div>
                         </Link>
                     </ul>
 

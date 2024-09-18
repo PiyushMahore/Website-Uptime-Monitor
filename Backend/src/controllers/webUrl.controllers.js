@@ -6,6 +6,7 @@ import { User } from "../models/user.model.js";
 import mongoose from "mongoose";
 import axios from "axios";
 import mailAlert from "../utils/emailAlert.js"
+import textAlert from "../utils/textAlert.js";
 
 const addWebUrl = asyncHandler(async (req, res) => {
   const { url, notificationType } = req.body;
@@ -38,13 +39,13 @@ const addWebUrl = asyncHandler(async (req, res) => {
 });
 
 const deleteUrl = asyncHandler(async (req, res) => {
-  const { url } = req.body;
+  const { urlId } = req.body;
 
-  if (!url) {
-    throw new apiError(404, "url is needed");
+  if (!urlId) {
+    throw new apiError(404, "urlId is needed");
   }
 
-  const isExist = await WebUrl.findOne({ Urls: url });
+  const isExist = await WebUrl.findById({ _id: urlId });
 
   if (!isExist) {
     throw new apiError(404, "not found");
@@ -192,10 +193,10 @@ const alertSender = asyncHandler(async (req, res) => {
   }
 
   if (receiversdata.notificationType === "email") {
-    await mailAlert(user.email)
+    await mailAlert(user)
   }
   else if (receiversdata.notificationType === "text") {
-    console.log("text")
+    await textAlert(user)
   } else {
     console.log("call")
   }

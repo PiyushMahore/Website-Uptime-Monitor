@@ -5,7 +5,6 @@ const webUrlSchema = new Schema(
         Urls: {
             type: String,
             required: true,
-            unique: true
         },
         notificationType: {
             type: String,
