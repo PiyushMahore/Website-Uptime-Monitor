@@ -54,6 +54,7 @@ export const DashboardContextProvider = (props) => {
             const response = await axios.post('http://localhost:3000/api/v1/webUrls/fetch-url', {
                 url // send the url as a query parameter
             })
+            console.log(response.data)
             return response.data
         } catch (error) {
             console.log("somthing went wrong while fetching url", error)

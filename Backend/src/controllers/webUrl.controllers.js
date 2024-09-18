@@ -24,7 +24,9 @@ const addWebUrl = asyncHandler(async (req, res) => {
     throw new apiError(401, "Invalid Url");
   }
 
-  const webUrl = await WebUrl.create({ Urls: url, notificationType: notificationType, userId: req.user?._id });
+  const response = await axios.get(url)
+
+  const webUrl = await WebUrl.create({ Urls: url, notificationType: notificationType, userId: req.user?._id, statusCode: response.status });
 
   if (!webUrl) {
     throw new apiError(
@@ -122,16 +124,15 @@ const fetchUrl = asyncHandler(async (req, res) => {
   }
 
   try {
-    const response = await axios.get(url);
-    const urlDescription = await WebUrl.find({ Urls: url });
+    const response = await axios.get(url.Urls);
+    const urlDescription = await WebUrl.findById(url._id);
+    urlDescription.statusCode = response.status
+    await urlDescription.save({ validateBeforeSave: false });
     return res
       .status(200)
       .json(new apiResponse(
         200,
-        {
-          URL: urlDescription,
-          statusCode: 500
-        },
+        urlDescription,
         `${response.status < 500 ? "Website is Perfectly working with status code" : "Website is down with status code of"} ${response.status}`
       ));
 
@@ -192,18 +193,20 @@ const alertSender = asyncHandler(async (req, res) => {
     throw new apiError(404, "cant find user from given user Id")
   }
 
+  let alert;
+
   if (receiversdata.notificationType === "email") {
-    await mailAlert(user)
+    alert = await mailAlert(user)
   }
   else if (receiversdata.notificationType === "text") {
-    await textAlert(user)
+    alert = await textAlert(user)
   } else {
     console.log("call")
   }
 
   return res
     .status(200)
-    .json(new apiResponse(200, {}, "Alert send successfully"))
+    .json(new apiResponse(200, alert, "Alert send successfully"))
 })
 
 export { addWebUrl, deleteUrl, editUrl, getAllUrls, fetchUrl, alertSender };

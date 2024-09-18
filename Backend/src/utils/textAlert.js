@@ -20,9 +20,10 @@ const textAlert = async (receiver) => {
             from: process.env.MOBILE_NUMBER,    // Your Twilio phone number
             to: receiver.mobileNumber          // Recipient's phone number
         });
-        console.log(`Message sent: ${send}`);
+        return send;
     } catch (error) {
         console.error('Error sending SMS:', error);
+        return null;
     }
 };
 

@@ -6,44 +6,51 @@ import { GiRadarSweep } from "react-icons/gi";
 import { MdDelete } from "react-icons/md";
 import DeleteUrlMenu from '../components/DeleteUrlMenu.jsx';
 import { useDashboardContext } from '../Context/DashboardContextProvider.jsx';
+import { MdRefresh } from "react-icons/md";
 
 function WebsiteMoniter() {
     const useDashboard = useDashboardContext()
 
+    const [notify, setNotify] = useState([])
     const [webDisplay, setWebdisplay] = useState(true)
     const [addUrlForm, setAddUrlForm] = useState(false)
     const [deleteForm, setDeleteForm] = useState(false)
-    const [allUrls, setAllUrls] = useState([])
     const [datetingUrl, setDatetingUrl] = useState(null)
 
     useEffect(() => {
-        setAllUrls(useDashboard.allUrls)
-    }, [useDashboard.allUrls])
-
-    useEffect(() => {
         const fetching = async () => {
-            allUrls.map(async (data) => {
-                const fetching = await useDashboard.fetchUrl(data.Urls)
+            useDashboard.allUrls.map(async (data) => {
+                const fetching = await useDashboard.fetchUrl(data)
                 if (fetching.data.statusCode >= 500) {
                     useDashboard.setNotWorkingUrls((prev) => [...prev, fetching.data.URL[0]])
+                    setNotify((prev) => [...prev, fetching.data.URL[0]])
+                }
+                const isWorkingNow = useDashboard.notWorkingUrls.find((data) => data._id === fetching.data.URL[0]._id)
+                if (isWorkingNow) {
+                    if (fetching.data.URL[0].statusCode < 500) {
+                        const newNotWorkingUrls = useDashboard.notWorkingUrls.filter((data) => data._id !== fetching.data.URL[0]._id)
+                        useDashboard.setNotWorkingUrls(newNotWorkingUrls)
+                    }
                 }
             })
         }
 
         fetching()
-    }, [allUrls])
+    }, [useDashboard.allUrls])
 
     useEffect(() => {
         if (useDashboard.notWorkingUrls.length > 0) {
-            useDashboard.notWorkingUrls.map((data) => {
-                useDashboard.alertSender(data, data.notificationType)
-                const pendingNotification = useDashboard.notWorkingUrls.filter((urls) => urls._id !== data._id)
-                useDashboard.setNotWorkingUrls(pendingNotification)
+            useDashboard.notWorkingUrls.map(async (data) => {
+                const notifier = await useDashboard.alertSender(data, data.notificationType)
+                if (notifier.data) {
+                    const pendingNotification = notifier.filter((urls) => urls._id !== data._id)
+                    setNotify(pendingNotification)
+                }
             })
         }
     }, [useDashboard.notWorkingUrls])
 
-    console.log(allUrls)
+    console.log(useDashboard.notWorkingUrls)
 
     return (
         <div className={`min-h-screen sm:px-[10%] sm:pt-[5%] px-4 py-4 bg-[#222838] relative`}>
@@ -64,11 +71,17 @@ function WebsiteMoniter() {
 
             <div className={`mt-12 ${addUrlForm ? "blur-sm" : ""} duration-300 overflow-hidden`}>
                 <div className={`border border-gray-500 rounded-lg ${webDisplay ? "max-h-[1000px]" : "max-h-[41.5px] border-0"} transition-all duration-500 ease-in-out`}>
-                    <span className={`flex items-center gap-2 px-5 py-2 border border-gray-500 rounded-md ${webDisplay ? "rounded-b-none" : ""}`}><MdArrowForwardIos onClick={() => setWebdisplay(!webDisplay)} className={`${webDisplay ? "rotate-90" : ""} duration-300`} /> Moniter</span>
+                    <span className={`flex items-center justify-between gap-2 px-5 py-2 border border-gray-500 rounded-md ${webDisplay ? "rounded-b-none" : ""}`}>
+                        <span className='flex items-center gap-2'>
+                            <MdArrowForwardIos onClick={() => setWebdisplay(!webDisplay)} className={`${webDisplay ? "rotate-90" : ""} duration-300`} />
+                            Moniter
+                        </span>
+                        <MdRefresh className='cursor-pointer' onClick={() => window.location.reload()} size={25} />
+                    </span>
 
                     <div className='rounded-b-lg overflow-hidden bg-[#2F3647]'>
                         {
-                            allUrls && allUrls.map((data) => (
+                            useDashboard.allUrls && useDashboard.allUrls.map((data) => (
                                 <span key={data._id}>
                                     <div className='pl-12 py-3'>
                                         <div className='flex items-center justify-between sm:pr-24'>

@@ -13,7 +13,6 @@ function AddUrlForm({ toggleForm }) {
         }
         await useDashboard.addUrl(url, notificationType)
         toggleForm(false)
-        window.location.reload()
     }
 
     return (

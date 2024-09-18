@@ -13,6 +13,9 @@ const webUrlSchema = new Schema(
         userId: {
             type: Schema.Types.ObjectId,
             ref: "User"
+        },
+        statusCode: {
+            type: Number,
         }
     },
     {
