@@ -181,7 +181,7 @@ const getAllUrls = asyncHandler(async (req, res) => {
 });
 
 const alertSender = asyncHandler(async (req, res) => {
-  const { receiversdata } = req.body;
+  const { token, receiversdata } = req.body;
 
   if (!receiversdata) {
     throw new apiError(404, "recervers data not reseved")
@@ -199,7 +199,7 @@ const alertSender = asyncHandler(async (req, res) => {
     alert = await mailAlert(user)
   }
   else if (receiversdata.notificationType === "text") {
-    alert = await textAlert(user)
+    alert = await textAlert(token, user)
   } else {
     console.log("call")
   }

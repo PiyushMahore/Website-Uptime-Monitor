@@ -21,11 +21,11 @@ function WebsiteMoniter() {
         const fetching = async () => {
             useDashboard.allUrls.map(async (data) => {
                 const fetching = await useDashboard.fetchUrl(data)
-                if (fetching.data.statusCode >= 500) {
-                    useDashboard.setNotWorkingUrls((prev) => [...prev, fetching.data.URL[0]])
-                    setNotify((prev) => [...prev, fetching.data.URL[0]])
+                if (fetching.data.statusCode <= 500) {
+                    useDashboard.setNotWorkingUrls((prev) => [...prev, fetching.data])
+                    setNotify((prev) => [...prev, fetching.data])
                 }
-                const isWorkingNow = useDashboard.notWorkingUrls.find((data) => data._id === fetching.data.URL[0]._id)
+                const isWorkingNow = useDashboard.notWorkingUrls.find((data) => data._id === fetching.data._id)
                 if (isWorkingNow) {
                     if (fetching.data.URL[0].statusCode < 500) {
                         const newNotWorkingUrls = useDashboard.notWorkingUrls.filter((data) => data._id !== fetching.data.URL[0]._id)
@@ -42,10 +42,11 @@ function WebsiteMoniter() {
         if (useDashboard.notWorkingUrls.length > 0) {
             useDashboard.notWorkingUrls.map(async (data) => {
                 const notifier = await useDashboard.alertSender(data, data.notificationType)
-                if (notifier.data) {
-                    const pendingNotification = notifier.filter((urls) => urls._id !== data._id)
-                    setNotify(pendingNotification)
-                }
+                console.log(notifier)
+                // if (notifier.data) {
+                //     const pendingNotification = notifier.filter((urls) => urls._id !== data._id)
+                //     setNotify(pendingNotification)
+                // }
             })
         }
     }, [useDashboard.notWorkingUrls])
@@ -86,7 +87,7 @@ function WebsiteMoniter() {
                                     <div className='pl-12 py-3'>
                                         <div className='flex items-center justify-between sm:pr-24'>
                                             <div className='flex items-center gap-7'>
-                                                <div className={`w-2.5 h-2.5 ${useDashboard.notWorkingUrls?.find((id) => id._id === data._id) ? "bg-red-600" : "bg-green-400"} rounded-full`}></div>
+                                                <div className={`w-2.5 h-2.5 ${data.statusCode >= 500 ? "bg-red-600" : "bg-green-400"} rounded-full`}></div>
                                                 <div className='text-sm'>
                                                     <p className='font-bold break-words w-60 sm:w-[550px] 2xl:w-full'>{data.Urls}</p>
                                                     <p className='text-green-600'>Up<span className='text-gray-400 ml-2 text-xs'>{`· ${data.createdAt.slice(0, 10)}`}</span></p>

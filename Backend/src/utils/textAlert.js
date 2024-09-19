@@ -1,29 +1,23 @@
-// Import the Twilio library
-import twilio from 'twilio';
-import dotenv from 'dotenv';
+import admin from 'firebase-admin';
+import serviceAccountKey from '../../public/serviceAccountKey.json' assert { type: 'json' };
 
-dotenv.config()
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccountKey),
+});
 
-// Twilio credentials (find these in your Twilio dashboard)
-const accountSid = process.env.TWILO_SID; // Replace with your Account SID
-const authToken = process.env.TWILO_AUTH_TOKEN;   // Replace with your Auth Token
-
-
-// Create a Twilio client
-const client = new twilio(accountSid, authToken);
-
-// Send a text message
-const textAlert = async (receiver) => {
+const textAlert = async (token, receiver) => {
+    const message = {
+        notification: {
+            title: 'Website Alert',
+            body: `Hi ${receiver.fullName},\nit looks like the website is down. Please check and resolve the issue when you can.\nUPTIME MONITOR`,
+        },
+        token,
+    };
     try {
-        const send = await client.messages.create({
-            body: `Hi ${receiver.fullName},\nit looks like the website is down. Please check and resolve the issue when you can.\nUPTIME MONITOR`,  // Message content
-            from: process.env.MOBILE_NUMBER,    // Your Twilio phone number
-            to: receiver.mobileNumber          // Recipient's phone number
-        });
-        return send;
+        const response = await admin.messaging().send(message);
+        console.log('Successfully sent message:', response);
     } catch (error) {
-        console.error('Error sending SMS:', error);
-        return null;
+        console.error('Error sending message:', error);
     }
 };
 
