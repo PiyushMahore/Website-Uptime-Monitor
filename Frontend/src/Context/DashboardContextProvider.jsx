@@ -1,21 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
-import { initializeApp } from 'firebase/app';
-import { getMessaging, getToken, onMessage } from 'firebase/messaging';
-
-const firebaseConfig = {
-    apiKey: "AIzaSyAjrn96MtSm4m7jYvnpS3Z6Wd_kd6e9mFM",
-    authDomain: "uptime-monitor-23aa0.firebaseapp.com",
-    projectId: "uptime-monitor-23aa0",
-    storageBucket: "uptime-monitor-23aa0.appspot.com",
-    messagingSenderId: "432276213303",
-    appId: "1:432276213303:web:509679754f57b56cc539b2",
-    measurementId: "G-PNTNHXN9GP",
-    vapidKey: "Zz3rDiYsJK-VVIZFxWKpeKkarCS8YOdDfimEUJMhzSo"
-};
-
-const app = initializeApp(firebaseConfig);
-const messaging = getMessaging(app);
 
 const dashboardContext = createContext()
 
@@ -81,12 +65,11 @@ export const DashboardContextProvider = (props) => {
 
     const alertSender = async (userData) => {
         try {
-            const token = await getToken(messaging, { vapidKey: firebaseConfig.vapidKey });
             const response = await axios.post('http://localhost:3000/api/v1/webUrls/alert', {
                 receiversdata: userData,
-                token: token
             });
             return response.data;
+
         } catch (error) {
             console.log("something went wrong sending alert", error);
         }

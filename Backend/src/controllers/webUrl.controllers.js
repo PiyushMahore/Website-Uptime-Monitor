@@ -6,7 +6,6 @@ import { User } from "../models/user.model.js";
 import mongoose from "mongoose";
 import axios from "axios";
 import mailAlert from "../utils/emailAlert.js"
-import textAlert from "../utils/textAlert.js";
 
 const addWebUrl = asyncHandler(async (req, res) => {
   const { url, notificationType } = req.body;
@@ -181,7 +180,7 @@ const getAllUrls = asyncHandler(async (req, res) => {
 });
 
 const alertSender = asyncHandler(async (req, res) => {
-  const { token, receiversdata } = req.body;
+  const { receiversdata } = req.body;
 
   if (!receiversdata) {
     throw new apiError(404, "recervers data not reseved")
@@ -199,7 +198,7 @@ const alertSender = asyncHandler(async (req, res) => {
     alert = await mailAlert(user)
   }
   else if (receiversdata.notificationType === "text") {
-    alert = await textAlert(token, user)
+    console.log("text")
   } else {
     console.log("call")
   }
