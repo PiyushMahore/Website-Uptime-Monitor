@@ -39,11 +39,11 @@ export const UserContextProvider = (props) => {
     };
 
 
-    const login = async (email, password) => {
+    const login = async (loginCredintial, password) => {
         try {
             setLoading(true)
             const response = await axios.post('http://localhost:3000/api/v1/user/login', {
-                'email': email,
+                'loginCredintial': loginCredintial,
                 'password': password
             }, {
                 withCredentials: true, // Ensure cookies are sent with the request

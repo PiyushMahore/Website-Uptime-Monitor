@@ -70,14 +70,14 @@ const signUp = asyncHandler(async (req, res) => {
 })
 
 const logIn = asyncHandler(async (req, res) => {
-    const { userName, email, password } = req.body
+    const { loginCredintial, password } = req.body
 
-    if ((!userName && !email) || !password) {
+    if (!loginCredintial || !password) {
         throw new apiError(401, "invalid crediantials")
     }
 
     const correctOrNot = await User.findOne({
-        $or: [{ userName }, { email }]
+        $or: [{ userName: loginCredintial }, { email: loginCredintial }]
     })
 
     if (!correctOrNot) {
@@ -85,8 +85,6 @@ const logIn = asyncHandler(async (req, res) => {
     }
 
     const passwordCheck = await correctOrNot.changePassword(password)
-    console.log(passwordCheck);
-
 
     if (passwordCheck === false) {
         throw new apiError(401, "password is wrong")

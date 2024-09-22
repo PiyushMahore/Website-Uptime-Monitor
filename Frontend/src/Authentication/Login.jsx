@@ -23,6 +23,7 @@ function Login() {
             navigate(`/dashboard/${data.data._id}`)
         }
     }
+    console.log(email, password)
 
     if (useContexts.loading) return <Loading />
 

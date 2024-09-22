@@ -17,41 +17,48 @@ function WebsiteMoniter() {
     const [deleteForm, setDeleteForm] = useState(false)
     const [datetingUrl, setDatetingUrl] = useState(null)
 
-    useEffect(() => {
+    setInterval(() => {
         const fetching = async () => {
-            useDashboard.allUrls.map(async (data) => {
+            await useDashboard.allUrls.map(async (data) => {
                 const fetching = await useDashboard.fetchUrl(data)
-                if (fetching.data.statusCode <= 500) {
-                    useDashboard.setNotWorkingUrls((prev) => [...prev, fetching.data])
-                    setNotify((prev) => [...prev, fetching.data])
+                if (fetching.data.statusCode >= 500) {
+                    const isAlready = await useDashboard.notWorkingUrls.find((urlData) => urlData._id === fetching.data._id)
+                    if (!isAlready) {
+                        await useDashboard.setNotWorkingUrls((prev) => [...prev, fetching.data])
+                        setNotify((prev) => [...prev, fetching.data])
+                    }
                 }
-                const isWorkingNow = useDashboard.notWorkingUrls.find((data) => data._id === fetching.data._id)
+
+                const isWorkingNow = await useDashboard.notWorkingUrls.find((data) => data._id === fetching.data._id)
+
                 if (isWorkingNow) {
-                    if (fetching.data.URL[0].statusCode < 500) {
-                        const newNotWorkingUrls = useDashboard.notWorkingUrls.filter((data) => data._id !== fetching.data.URL[0]._id)
-                        useDashboard.setNotWorkingUrls(newNotWorkingUrls)
+                    if (fetching.data.statusCode < 500) {
+                        const newNotWorkingUrls = await useDashboard.notWorkingUrls.filter((data) => data._id !== fetching.data._id)
+                        await useDashboard.setNotWorkingUrls(newNotWorkingUrls)
                     }
                 }
             })
         }
-
         fetching()
-    }, [useDashboard.allUrls])
+    }, 10000)
 
     useEffect(() => {
-        if (useDashboard.notWorkingUrls.length > 0) {
-            useDashboard.notWorkingUrls.map(async (data) => {
-                const notifier = await useDashboard.alertSender(data, data.notificationType)
-                console.log(notifier)
-                // if (notifier.data) {
-                //     const pendingNotification = notifier.filter((urls) => urls._id !== data._id)
-                //     setNotify(pendingNotification)
-                // }
-            })
+        const notificationCheck = async () => {
+            if (useDashboard.notWorkingUrls.length > 0) {
+                await useDashboard.notWorkingUrls.map(async (data) => {
+                    const notifier = await useDashboard.alertSender(data, data.notificationType)
+                    if (notifier.data) {
+                        const pendingNotification = await notifier.data.filter((urls) => urls._id !== data._id)
+                        setNotify(pendingNotification)
+                    }
+                })
+            }
         }
+        notificationCheck()
     }, [useDashboard.notWorkingUrls])
 
-    console.log(useDashboard.notWorkingUrls)
+    console.log("notified", notify)
+    console.log("non workings", useDashboard.notWorkingUrls)
 
     return (
         <div className={`min-h-screen sm:px-[10%] sm:pt-[5%] px-4 py-4 bg-[#222838] relative`}>
