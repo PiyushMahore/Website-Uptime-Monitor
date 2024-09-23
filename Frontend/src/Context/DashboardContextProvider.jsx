@@ -4,7 +4,6 @@ import axios from "axios";
 const dashboardContext = createContext()
 
 export const DashboardContextProvider = (props) => {
-    const [notWorkingUrls, setNotWorkingUrls] = useState([])
     const [allUrls, setAllUrls] = useState([])
 
     const addUrl = async (Url, notificationType) => {
@@ -51,32 +50,20 @@ export const DashboardContextProvider = (props) => {
         }
     }
 
-    const fetchUrl = async (url) => {
+    const fetchUrls = async (urlDesc) => {
         try {
-            const response = await axios.post('http://localhost:3000/api/v1/webUrls/fetch-url', {
-                url // send the url as a query parameter
+            const response = await axios.post(`http://localhost:3000/api/v1/webUrls/check-urls`, {
+                "urlDesc": urlDesc
             })
-            return response.data
-
-        } catch (error) {
-            console.log("somthing went wrong while fetching url", error)
-        }
-    }
-
-    const alertSender = async (userData) => {
-        try {
-            const response = await axios.post('http://localhost:3000/api/v1/webUrls/alert', {
-                receiversdata: userData,
-            });
             return response.data;
 
         } catch (error) {
-            console.log("something went wrong sending alert", error);
+            console.log("Somthing went wrong while fetching URLs", error)
         }
-    };
+    }
 
     return (
-        <dashboardContext.Provider value={{ addUrl, allUrls, deleteUrl, fetchUrl, getAllUrls, notWorkingUrls, setNotWorkingUrls, alertSender }}>
+        <dashboardContext.Provider value={{ addUrl, allUrls, deleteUrl, getAllUrls, fetchUrls }}>
             {props.children}
         </dashboardContext.Provider>
     )

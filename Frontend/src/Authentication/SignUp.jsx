@@ -3,14 +3,14 @@ import { MDBBtn, MDBContainer, MDBRow, MDBCol, MDBCard, MDBCardBody, MDBInput } 
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Loading from "../components/Loading";
 import { useNavigate } from "react-router";
-import { useProvider } from "../Context/UserContextProvider";
+import { useUserContext } from "../Context/UserContextProvider";
 
 function SignUp() {
     useEffect(() => {
         import('mdb-react-ui-kit/dist/css/mdb.min.css');
     }, []);
 
-    const useContexts = useProvider()
+    const useContexts = useUserContext()
     const navigate = useNavigate()
     const msgRef = useRef(null)
 

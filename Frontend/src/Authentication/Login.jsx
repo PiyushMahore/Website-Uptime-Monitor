@@ -3,7 +3,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import { MDBBtn, MDBContainer, MDBRow, MDBCol, MDBCard, MDBCardBody, MDBInput, MDBIcon } from 'mdb-react-ui-kit';
 import { NavLink, useNavigate } from 'react-router-dom'
 import Loading from '../components/Loading';
-import { useProvider } from '../Context/UserContextProvider';
+import { useUserContext } from '../Context/UserContextProvider';
 
 function Login() {
     useEffect(() => {
@@ -12,7 +12,7 @@ function Login() {
 
     const msgRef = useRef(null)
     const navigate = useNavigate()
-    const useContexts = useProvider()
+    const useContexts = useUserContext()
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
@@ -23,7 +23,6 @@ function Login() {
             navigate(`/dashboard/${data.data._id}`)
         }
     }
-    console.log(email, password)
 
     if (useContexts.loading) return <Loading />
 

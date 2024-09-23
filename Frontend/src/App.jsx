@@ -4,11 +4,11 @@ import Feature from './pages/Feature'
 import Alerts from './pages/Alerts'
 import Home from './pages/Home'
 import Footer from './components/Footer'
-import { useProvider } from './Context/UserContextProvider'
+import { useUserContext } from './Context/UserContextProvider'
 import { Navigate } from 'react-router'
 
 function App() {
-  const useUser = useProvider()
+  const useUser = useUserContext()
   const [user, setUser] = useState(null)
 
   useEffect(() => {

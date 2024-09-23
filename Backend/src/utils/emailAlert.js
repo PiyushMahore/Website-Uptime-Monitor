@@ -15,12 +15,13 @@ const transporter = nodemailer.createTransport({
 async function mailAlert(receiver) {
     try {
         // Send the email
-        await transporter.sendMail({
+        const response = await transporter.sendMail({
             from: process.env.EMAIL, // sender address
             to: receiver.email,      // recipient's email address
             subject: 'Website Downtime',  // Subject line
             text: `Hi ${receiver.fullName},\n\nJust a heads-up, it looks like the website is currently down. Please check and resolve the issue at your earliest convenience.\n\nBest regards,\nUptime Monitor`,  // plain text body
         });
+        return response
 
     } catch (error) {
         console.error('Error sending email:', error);

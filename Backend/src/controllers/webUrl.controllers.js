@@ -2,10 +2,11 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import { WebUrl } from "../models/webUrl.model.js";
-import { User } from "../models/user.model.js";
 import mongoose from "mongoose";
 import axios from "axios";
-import mailAlert from "../utils/emailAlert.js"
+import { fetchUrl } from "../utils/urlFetcher.js";
+import { alertSender } from "../utils/alertSender.js";
+import { User } from "../models/user.model.js";
 
 const addWebUrl = asyncHandler(async (req, res) => {
   const { url, notificationType } = req.body;
@@ -115,31 +116,6 @@ const editUrl = asyncHandler(async (req, res) => {
     .json(new apiResponse(200, urlExist, "Url Updated successfully"));
 });
 
-const fetchUrl = asyncHandler(async (req, res) => {
-  const { url } = req.body;
-
-  if (!url) {
-    throw new apiError(404, "url field is empty");
-  }
-
-  try {
-    const response = await axios.get(url.Urls);
-    const urlDescription = await WebUrl.findById(url._id);
-    urlDescription.statusCode = response.status
-    await urlDescription.save({ validateBeforeSave: false });
-    return res
-      .status(200)
-      .json(new apiResponse(
-        200,
-        urlDescription,
-        `${response.status < 500 ? "Website is Perfectly working with status code" : "Website is down with status code of"} ${response.status}`
-      ));
-
-  } catch (error) {
-    throw new apiError(500, "Unable to fetch api", error);
-  }
-});
-
 const getAllUrls = asyncHandler(async (req, res) => {
   const urls = await WebUrl.aggregate([
     {
@@ -179,33 +155,34 @@ const getAllUrls = asyncHandler(async (req, res) => {
     .json(new apiResponse(200, urls, "All web urls fetched successfully"));
 });
 
-const alertSender = asyncHandler(async (req, res) => {
-  const { receiversdata } = req.body;
+const checkUrls = asyncHandler(async (req, res) => {
+  const { urlDesc } = req.body;
 
-  if (!receiversdata) {
-    throw new apiError(404, "recervers data not reseved")
+  if (!urlDesc) {
+    throw new apiError(401, "no url to check")
   }
 
-  const user = await User.findById(receiversdata.userId)
+  const isExist = await WebUrl.findById(urlDesc._id);
 
-  if (!user) {
-    throw new apiError(404, "cant find user from given user Id")
+  if (!isExist) {
+    throw new apiError(404, "given url is not valid")
   }
 
-  let alert;
+  const urlCheck = await fetchUrl(urlDesc);
 
-  if (receiversdata.notificationType === "email") {
-    alert = await mailAlert(user)
-  }
-  else if (receiversdata.notificationType === "text") {
-    console.log("text")
-  } else {
-    console.log("call")
+  if (urlCheck.status >= 500) {
+    const alertSend = await alertSender(urlDesc)
+    if (!alertSend?.messageId) {
+      throw new apiError(500, "failed to send notification")
+    }
+    return res
+      .status(200)
+      .json(new apiResponse(200, { urlstatus: urlCheck.status }, `your webisite is not working with status code ${urlCheck.status} we have alerted to the owner of website`))
   }
 
   return res
     .status(200)
-    .json(new apiResponse(200, alert, "Alert send successfully"))
+    .json(new apiResponse(200, { urlstatus: urlCheck.status }, `your webisite is perfectly working with status code ${urlCheck.status}`))
 })
 
-export { addWebUrl, deleteUrl, editUrl, getAllUrls, fetchUrl, alertSender };
+export { addWebUrl, deleteUrl, editUrl, getAllUrls, checkUrls };

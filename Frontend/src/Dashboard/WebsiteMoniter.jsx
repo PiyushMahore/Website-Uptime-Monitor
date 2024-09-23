@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { IoIosSearch } from "react-icons/io";
 import { MdArrowForwardIos } from "react-icons/md";
 import AddUrlForm from "../components/AddUrlForm.jsx";
@@ -11,54 +11,20 @@ import { MdRefresh } from "react-icons/md";
 function WebsiteMoniter() {
     const useDashboard = useDashboardContext()
 
-    const [notify, setNotify] = useState([])
     const [webDisplay, setWebdisplay] = useState(true)
     const [addUrlForm, setAddUrlForm] = useState(false)
     const [deleteForm, setDeleteForm] = useState(false)
     const [datetingUrl, setDatetingUrl] = useState(null)
 
     setInterval(() => {
-        const fetching = async () => {
-            await useDashboard.allUrls.map(async (data) => {
-                const fetching = await useDashboard.fetchUrl(data)
-                if (fetching.data.statusCode >= 500) {
-                    const isAlready = await useDashboard.notWorkingUrls.find((urlData) => urlData._id === fetching.data._id)
-                    if (!isAlready) {
-                        await useDashboard.setNotWorkingUrls((prev) => [...prev, fetching.data])
-                        setNotify((prev) => [...prev, fetching.data])
-                    }
-                }
-
-                const isWorkingNow = await useDashboard.notWorkingUrls.find((data) => data._id === fetching.data._id)
-
-                if (isWorkingNow) {
-                    if (fetching.data.statusCode < 500) {
-                        const newNotWorkingUrls = await useDashboard.notWorkingUrls.filter((data) => data._id !== fetching.data._id)
-                        await useDashboard.setNotWorkingUrls(newNotWorkingUrls)
-                    }
-                }
-            })
-        }
-        fetching()
-    }, 10000)
-
-    useEffect(() => {
-        const notificationCheck = async () => {
-            if (useDashboard.notWorkingUrls.length > 0) {
-                await useDashboard.notWorkingUrls.map(async (data) => {
-                    const notifier = await useDashboard.alertSender(data, data.notificationType)
-                    if (notifier.data) {
-                        const pendingNotification = await notifier.data.filter((urls) => urls._id !== data._id)
-                        setNotify(pendingNotification)
-                    }
-                })
+        const fetch = async () => {
+            if (useDashboard.allUrls.length > 0) {
+                await useDashboard.allUrls.map(async (data) => await useDashboard.fetchUrls(data))
             }
         }
-        notificationCheck()
-    }, [useDashboard.notWorkingUrls])
 
-    console.log("notified", notify)
-    console.log("non workings", useDashboard.notWorkingUrls)
+        fetch()
+    }, 180000)
 
     return (
         <div className={`min-h-screen sm:px-[10%] sm:pt-[5%] px-4 py-4 bg-[#222838] relative`}>
