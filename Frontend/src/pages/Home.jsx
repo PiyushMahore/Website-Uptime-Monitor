@@ -47,14 +47,14 @@ function Home() {
     return (
         <div className='home h-screen radial-gradient-custom p-1 text-center'>
             <Navbar />
-            <hr className='sm:border border-0 border-gray-200' />
+            <hr className='sm:border border-0 dark:border-gray-200 border-black' />
             <div className='flex h-full justify-center items-center flex-col gap-5 animation'>
                 <h1 className='sm:text-8xl text-5xl font-bold '>We call you when your</h1>
                 <TextTransition className='sm:text-8xl text-5xl font-bold' springConfig={presets.wobbly}>{TEXTS[index % TEXTS.length]}</TextTransition>
-                <p className=''>Get notified with a radically better infrastructure monitoring platform.</p>
+                <p>Get notified with a radically better infrastructure monitoring platform.</p>
                 <div className='flex gap-3 '>
-                    <input value={url} onChange={(e) => setUrl(e.target.value)} className=' rounded-xl text-black sm:w-[500px] sm:focus:w-[498px] focus:outline-none bg-[#f4f7fa] h-[43px] p-2' type="text" placeholder='example:https://example.com' />
-                    <button onClick={fetchUrl} className=' border hover:scale-110 hover:border-none duration-200 border-[#f4f7fa] px-5 py-[10px] sm:px-10 sm:py-[10px] rounded-2xl'>Get Your Result</button>
+                    <input value={url} onChange={(e) => setUrl(e.target.value)} className='rounded-xl text-black sm:w-[500px] sm:focus:w-[498px] border border-black focus:outline-none dark:bg-[#f4f7fa] bg-transparent h-[43px] p-2' type="text" placeholder='example:https://example.com' />
+                    <button onClick={fetchUrl} className=' border hover:scale-110 hover:border-none duration-200 dark:border-[#f4f7fa] border-gray-700 px-5 py-[10px] sm:px-10 sm:py-[10px] rounded-2xl'>Get Your Result</button>
                 </div>
                 <p ref={msgRef} className={`${isWorking ? "text-red-600" : "text-green-600"} text-xl`}></p>
             </div>

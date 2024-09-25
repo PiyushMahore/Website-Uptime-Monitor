@@ -9,8 +9,8 @@ function Alerts() {
             </div>
             <div className='flex justify-center flex-wrap gap-8 mt-14 p-1 text-center'>
 
-                <div className="animation sm:w-[30%] relative inline-block rounded-tl-3xl rounded-bl-3xl border-y border-l border-white py-3 pl-3">
-                    <div className='rounded-3xl radial-gradient-custom border-gray-300 border overflow-hidden shadow-xl shadow-gray-500'>
+                <div className="animation sm:w-[30%] relative inline-block rounded-tl-3xl rounded-bl-3xl border-y border-l dark:border-white border-gray-900 py-3 pl-3">
+                    <div className='rounded-3xl radial-gradient-custom dark:border-gray-300 border-gray-900 border overflow-hidden shadow-xl dark:shadow-gray-500 shadow-gray-900'>
                         <div className='absolute w-full -translate-x-[50%] top-12 left-[40%]'>
                             <h3 className='text-4xl'>On-call scheduling</h3>
                         </div>
@@ -19,16 +19,16 @@ function Alerts() {
                 </div>
 
                 <div className="animation sm:w-[30%] text-gray-800 relative inline-block rounded-tl-3xl rounded-bl-3xl">
-                    <div className='rounded-3xl h-[470px] radial-gradient-custom border-gray-300 border overflow-hidden shadow-xl shadow-gray-500'>
+                    <div className='rounded-3xl h-[470px] radial-gradient-custom dark:border-gray-300 border-gray-900 border overflow-hidden shadow-xl dark:shadow-gray-500 shadow-gray-900'>
                         <div className='absolute w-full -translate-x-[50%] top-12 left-[50%]'>
                             <h3 className='text-4xl'>Unlimited voice call alerts</h3>
                         </div>
-                        <img className='w-full h-auto' src="https://betterstack.com/assets/v2/uptime/call-alerts-cde9f33376337c149badf3b40df6c16037fefc65be02f0b5c90aa53447fbcf88.jpg" alt="" />
+                        <img className='w-full h-[500px]' src="https://betterstack.com/assets/v2/uptime/call-alerts-cde9f33376337c149badf3b40df6c16037fefc65be02f0b5c90aa53447fbcf88.jpg" alt="" />
                     </div>
                 </div>
 
-                <div className="animation sm:w-[30%] relative inline-block rounded-tr-3xl rounded-br-3xl border-y border-r border-white py-3 pr-3">
-                    <div className='rounded-3xl h-[454px] radial-gradient-custom border-gray-300 border overflow-hidden shadow-xl shadow-gray-500'>
+                <div className="animation sm:w-[30%] relative inline-block rounded-tr-3xl rounded-br-3xl border-y border-r dark:border-white border-gray-900 py-3 pr-3">
+                    <div className='rounded-3xl h-[454px] radial-gradient-custom dark:border-gray-300 border-gray-900 border overflow-hidden shadow-xl dark:shadow-gray-500 shadow-gray-900'>
                         <div className='absolute w-full -translate-x-[50%] top-12 left-[40%] overflow-hidden'>
                             <h3 className='text-4xl'>On-call scheduling</h3>
                         </div>

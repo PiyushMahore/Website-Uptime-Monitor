@@ -6,14 +6,19 @@
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #0B0C14;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  @apply bg-gray-100 text-gray-900;
+}
+
+body.dark {
+  @apply bg-[#0B0C14]; /* Tailwind custom color for dark mode background */
+  color: rgba(255, 255, 255, 0.87); /* Dark mode text color */
 }
 
 @keyframes fadeInUp {

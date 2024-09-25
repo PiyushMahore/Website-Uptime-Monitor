@@ -12,6 +12,11 @@ function App() {
   const [user, setUser] = useState(null)
 
   useEffect(() => {
+    const theme = localStorage.getItem("theme")
+    document.body.classList.add(theme)
+  }, [])
+
+  useEffect(() => {
     const fetchUser = async () => {
       try {
         const currentUser = await useUser.getCurrentUser();
