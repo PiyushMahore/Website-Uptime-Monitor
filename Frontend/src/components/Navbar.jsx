@@ -7,17 +7,20 @@ import { IoMoon, IoSunny } from "react-icons/io5";
 function Navbar() {
     const currentTheme = localStorage.getItem("theme")
     const [nav, setNav] = useState(false);
+    const [darkMode, setDarkMode] = useState(currentTheme === "dark" ? true : false)
 
     const darkTheme = () => {
         localStorage.setItem("theme", "dark")
         document.body.classList.remove("light")
         document.body.classList.add("dark")
+        setDarkMode(!darkMode)
     }
 
     const lightTheme = () => {
         localStorage.setItem("theme", "light")
         document.body.classList.remove("dark")
         document.body.classList.add("light")
+        setDarkMode(!darkMode)
     }
 
     return (
@@ -46,7 +49,7 @@ function Navbar() {
                             Sign Up
                         </button>
                     </NavLink>
-                    {currentTheme === "dark" ? <IoSunny onClick={lightTheme} size={25} /> : <IoMoon onClick={darkTheme} size={25} />}
+                    {darkMode ? <IoSunny onClick={lightTheme} size={25} /> : <IoMoon onClick={darkTheme} size={25} />}
                 </ul>
             </div>
 

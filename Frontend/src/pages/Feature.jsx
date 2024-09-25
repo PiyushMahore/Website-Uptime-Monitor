@@ -3,7 +3,7 @@ import FeatureImg from '../../public/FeaturedImg.jpg'
 
 function Feature() {
     return (
-        <div className='mt-12 flex items-center justify-center flex-col-reverse sm:flex-row gap-20 sm:px-40 pl-11 pr-16'>
+        <div className='mt-12 flex items-center justify-center flex-col-reverse sm:flex-row gap-20 sm:px-40'>
             <div className='sm:w-[40%] text-left animation'>
                 <h6 style={{ backgroundColor: 'rgb(124 135 247 / 0.1)', borderColor: 'rgb(124 135 247 / 0.36)' }} className='px-3 py-1.5 rounded-full border w-fit'>UPTIME MONITERING</h6>
                 <h1 className='sm:text-6xl text-5xl font-semibold'>
