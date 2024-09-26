@@ -57,6 +57,7 @@ function Navbar() {
             <div className='flex justify-center items-center flex-col sm:hidden overflow-hidden'>
                 <div className={`list-none absolute top-2 left-0 w-screen ${nav ? "translate-y-0" : "-translate-y-[80%]"} transition-transform duration-500 ease-in-out flex items-center flex-col`}>
                     <ul className='dark:bg-[#7c89e602] dark:text-white text-black mb-1 flex gap-2 flex-col w-screen p-4 z-20'>
+                        {darkMode ? <IoSunny className='self-end' onClick={lightTheme} size={25} /> : <IoMoon className='self-end' onClick={darkTheme} size={25} />}
                         <Link to='home' spy={true} smooth={true} offset={50} duration={500} className={`relative inline-block ${nav ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300 ease-in-out`}>
                             <div className="underline underline-offset-8">Home</div>
                         </Link>
@@ -70,13 +71,13 @@ function Navbar() {
 
                     <ul className='flex justify-between w-screen px-4 z-20'>
                         <NavLink to='/login'>
-                            <button className='dark:hover:text-white text-black mt-1'>
+                            <button className='dark:text-white text-black mt-1'>
                                 Sign In
                             </button>
                         </NavLink>
                         <MdKeyboardArrowDown className={`${nav ? "rotate-180" : ""} duration-500`} onClick={() => setNav(!nav)} size={45} />
                         <NavLink to='/sign-up'>
-                            <button className='dark:hover:text-white text-black mt-1'>
+                            <button className='text-black dark:text-white mt-1'>
                                 Sign Up
                             </button>
                         </NavLink>

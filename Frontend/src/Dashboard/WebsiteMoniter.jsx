@@ -7,8 +7,11 @@ import { MdDelete } from "react-icons/md";
 import DeleteUrlMenu from '../components/DeleteUrlMenu.jsx';
 import { useDashboardContext } from '../Context/DashboardContextProvider.jsx';
 import { MdRefresh } from "react-icons/md";
+import { useParams } from 'react-router-dom';
+import Loading from '../components/Loading.jsx';
 
 function WebsiteMoniter() {
+    const { id } = useParams()
     const useDashboard = useDashboardContext()
 
     const [webDisplay, setWebdisplay] = useState(true)
@@ -27,14 +30,14 @@ function WebsiteMoniter() {
     }, 180000)
 
     return (
-        <div className={`min-h-screen sm:px-[10%] sm:pt-[5%] px-4 py-4 bg-[#222838] relative`}>
+        <div className={`min-h-screen sm:px-[10%] sm:pt-[5%] px-4 py-4 dark:bg-[#222838] relative`}>
             <div className={`flex justify-start ${addUrlForm || deleteForm ? "blur-sm" : ""}`}>
                 <div className='flex sm:gap-16 gap-6 flex-wrap'>
-                    <h1 className='sm:text-3xl text-xl font-bold'>How has your day been so far, Piyush ?</h1>
+                    <h1 className='sm:text-3xl text-lg font-bold'>How has your day been so far, {useDashboard.allUrls[0]?.userAllWebUrls[0].fullName.split(" ")[0]} ?</h1>
                     <div className='flex flex-col sm:flex-row justify-start gap-6 items-start sm:items-center'>
-                        <div className='flex items-center text-gray-500'>
+                        <div className='flex items-center dark:text-gray-500 text-black'>
                             <div className='absolute ml-2'><IoIosSearch /></div>
-                            <input placeholder='Search' className='pl-8 h-8 w-72 rounded-lg focus:outline-none border border-gray-500 inputShadow bg-[#222838] text-white' type="search" />
+                            <input placeholder='Search' className='pl-8 h-8 w-72 rounded-lg focus:outline-none border border-gray-500 inputShadow dark:bg-[#222838] dark:text-white' type="search" />
                         </div>
                         <button onClick={() => setAddUrlForm(true)} className='bg-[#5B63D3] rounded-lg hover:bg-[#3788d8] px-4 py-1.5'>Create monitor</button>
                     </div>
@@ -53,17 +56,17 @@ function WebsiteMoniter() {
                         <MdRefresh className='cursor-pointer' onClick={() => window.location.reload()} size={25} />
                     </span>
 
-                    <div className='rounded-b-lg overflow-hidden bg-[#2F3647]'>
+                    <div className='rounded-b-lg overflow-hidden dark:bg-[#2F3647] bg-gray-200'>
                         {
                             useDashboard.allUrls && useDashboard.allUrls.map((data) => (
                                 <span key={data._id}>
                                     <div className='pl-12 py-3'>
                                         <div className='flex items-center justify-between sm:pr-24'>
                                             <div className='flex items-center gap-7'>
-                                                <div className={`w-2.5 h-2.5 ${data.statusCode >= 500 ? "bg-red-600" : "bg-green-400"} rounded-full`}></div>
+                                                <div className={`w-2.5 h-2.5 ${data.statusCode >= 500 ? "bg-red-600" : "dark:bg-green-400 bg-green-600"} rounded-full`}></div>
                                                 <div className='text-sm'>
                                                     <p className='font-bold break-words w-60 sm:w-[550px] 2xl:w-full'>{data.Urls}</p>
-                                                    <p className='text-green-600'>Up<span className='text-gray-400 ml-2 text-xs'>{`· ${data.createdAt.slice(0, 10)}`}</span></p>
+                                                    <p className='text-green-600'>Up<span className='dark:text-gray-400 text-gray-600 ml-2 text-xs'>{`· ${data.createdAt.slice(0, 10)}`}</span></p>
                                                 </div>
                                             </div>
                                             <div className='sm:flex hidden items-center gap-12'>
