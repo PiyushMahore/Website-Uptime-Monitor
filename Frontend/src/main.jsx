@@ -10,15 +10,12 @@ import SignUp from './Authentication/SignUp.jsx';
 import Login from './Authentication/Login.jsx'
 import { UserContextProvider } from './Context/UserContextProvider.jsx';
 import { DashboardContextProvider } from './Context/DashboardContextProvider.jsx';
+import WebUrlDashboard from '../src/Dashboard/WebUrlDashboard.jsx'
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />
-  },
-  {
-    path: "/dashboard/:id",
-    element: <WebsiteMoniter />
   },
   {
     path: "/sign-up",
@@ -28,6 +25,14 @@ const router = createBrowserRouter([
     path: "/login",
     element: <Login />
   },
+  {
+    path: "/dashboard/:id",
+    element: <WebsiteMoniter />
+  },
+  {
+    path: '/url/:urlId',
+    element: <WebUrlDashboard />
+  }
 ])
 
 createRoot(document.getElementById('root')).render(

@@ -7,8 +7,7 @@ import { MdDelete } from "react-icons/md";
 import DeleteUrlMenu from '../components/DeleteUrlMenu.jsx';
 import { useDashboardContext } from '../Context/DashboardContextProvider.jsx';
 import { MdRefresh } from "react-icons/md";
-import { useParams } from 'react-router-dom';
-import Loading from '../components/Loading.jsx';
+import { NavLink, useParams } from 'react-router-dom';
 
 function WebsiteMoniter() {
     const { id } = useParams()
@@ -47,7 +46,7 @@ function WebsiteMoniter() {
             {addUrlForm ? <AddUrlForm toggleForm={setAddUrlForm} /> : ""}
 
             <div className={`mt-12 ${addUrlForm ? "blur-sm" : ""} duration-300 overflow-hidden`}>
-                <div className={`border border-gray-500 rounded-lg ${webDisplay ? "max-h-[1000px]" : "max-h-[42px] border-0"} transition-all duration-500 ease-in-out`}>
+                <div className={`border border-gray-500 rounded-lg ${webDisplay ? "max-h-[1000px]" : "max-h-[43px] border-0"} transition-all duration-500 ease-in-out`}>
                     <span className={`flex items-center justify-between gap-2 px-5 py-2 border border-gray-500 rounded-md ${webDisplay ? "rounded-b-none" : ""}`}>
                         <span className='flex items-center gap-2'>
                             <MdArrowForwardIos onClick={() => setWebdisplay(!webDisplay)} className={`${webDisplay ? "rotate-90" : ""} duration-300`} />
@@ -59,7 +58,7 @@ function WebsiteMoniter() {
                     <div className='rounded-b-lg overflow-hidden dark:bg-[#2F3647] bg-gray-200'>
                         {
                             useDashboard.allUrls && useDashboard.allUrls.map((data) => (
-                                <span key={data._id}>
+                                <NavLink to={`/url/${data._id}`} key={data._id}>
                                     <div className='pl-12 py-3'>
                                         <div className='flex items-center justify-between sm:pr-24'>
                                             <div className='flex items-center gap-7'>
@@ -84,7 +83,7 @@ function WebsiteMoniter() {
                                         </div>
                                     </div>
                                     <hr className="border-gray-500" />
-                                </span>
+                                </NavLink>
                             ))
                         }
 
