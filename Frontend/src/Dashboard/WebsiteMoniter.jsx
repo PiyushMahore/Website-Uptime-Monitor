@@ -58,16 +58,16 @@ function WebsiteMoniter() {
                     <div className='rounded-b-lg overflow-hidden dark:bg-[#2F3647] bg-gray-200'>
                         {
                             useDashboard.allUrls && useDashboard.allUrls.map((data) => (
-                                <NavLink to={`/url/${data._id}`} key={data._id}>
+                                <span key={data._id}>
                                     <div className='pl-12 py-3'>
                                         <div className='flex items-center justify-between sm:pr-24'>
-                                            <div className='flex items-center gap-7'>
+                                            <NavLink to={`/url/${data._id}`} className='flex items-center gap-7'>
                                                 <div className={`w-2.5 h-2.5 ${data.statusCode >= 500 ? "bg-red-600" : "dark:bg-green-400 bg-green-600"} rounded-full`}></div>
                                                 <div className='text-sm'>
                                                     <p className='font-bold break-words w-60 sm:w-[550px] 2xl:w-full'>{data.Urls}</p>
                                                     <p className='text-green-600'>Up<span className='dark:text-gray-400 text-gray-600 ml-2 text-xs'>{`· ${data.createdAt.slice(0, 10)}`}</span></p>
                                                 </div>
-                                            </div>
+                                            </NavLink>
                                             <div className='sm:flex hidden items-center gap-12'>
                                                 <div className='flex items-center gap-2'>
                                                     <GiRadarSweep />
@@ -83,7 +83,7 @@ function WebsiteMoniter() {
                                         </div>
                                     </div>
                                     <hr className="border-gray-500" />
-                                </NavLink>
+                                </span>
                             ))
                         }
 
