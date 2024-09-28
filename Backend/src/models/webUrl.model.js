@@ -16,7 +16,8 @@ const webUrlSchema = new Schema(
         },
         statusCode: {
             type: Number,
-        }
+        },
+        statusCodes: []
     },
     {
         timestamps: true

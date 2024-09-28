@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { IoIosSearch } from "react-icons/io";
 import { MdArrowForwardIos } from "react-icons/md";
 import AddUrlForm from "../components/AddUrlForm.jsx";
@@ -18,13 +18,13 @@ function WebsiteMoniter() {
     const [deleteForm, setDeleteForm] = useState(false)
     const [datetingUrl, setDatetingUrl] = useState(null)
 
-    setInterval(() => {
-        const fetch = async () => {
-            if (useDashboard.allUrls.length > 0) {
-                await useDashboard.allUrls.map(async (data) => await useDashboard.fetchUrls(data))
-            }
+    const fetch = async () => {
+        if (useDashboard.allUrls.length > 0) {
+            await useDashboard.allUrls.map(async (data) => await useDashboard.fetchUrls(data))
         }
+    }
 
+    setInterval(() => {
         fetch()
     }, 180000)
 

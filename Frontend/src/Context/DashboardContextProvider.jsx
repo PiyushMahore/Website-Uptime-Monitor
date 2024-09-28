@@ -62,8 +62,18 @@ export const DashboardContextProvider = (props) => {
         }
     }
 
+    const getSingleUrl = async (urlId) => {
+        try {
+            const response = await axios.get(`http://localhost:3000/api/v1/webUrls/get-single-url/${urlId}`)
+            return response.data;
+
+        } catch (error) {
+            console.log("somthing went wrong while getting single url")
+        }
+    }
+
     return (
-        <dashboardContext.Provider value={{ addUrl, allUrls, deleteUrl, getAllUrls, fetchUrls }}>
+        <dashboardContext.Provider value={{ addUrl, allUrls, deleteUrl, getAllUrls, fetchUrls, getSingleUrl }}>
             {props.children}
         </dashboardContext.Provider>
     )

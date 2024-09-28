@@ -6,7 +6,6 @@ import mongoose from "mongoose";
 import axios from "axios";
 import { fetchUrl } from "../utils/urlFetcher.js";
 import { alertSender } from "../utils/alertSender.js";
-import { User } from "../models/user.model.js";
 
 const addWebUrl = asyncHandler(async (req, res) => {
   const { url, notificationType } = req.body;
@@ -26,7 +25,7 @@ const addWebUrl = asyncHandler(async (req, res) => {
 
   const response = await axios.get(url)
 
-  const webUrl = await WebUrl.create({ Urls: url, notificationType: notificationType, userId: req.user?._id, statusCode: response.status });
+  const webUrl = await WebUrl.create({ Urls: url, notificationType: notificationType, userId: req.user?._id, statusCode: response.status, statusCodes: { responseStatus: response.status, time: Date.now() } });
 
   if (!webUrl) {
     throw new apiError(
@@ -116,6 +115,24 @@ const editUrl = asyncHandler(async (req, res) => {
     .json(new apiResponse(200, urlExist, "Url Updated successfully"));
 });
 
+const getOneUrl = asyncHandler(async (req, res) => {
+  const { urlId } = req.params
+
+  if (!urlId) {
+    throw new apiError(401, "urlId is required")
+  }
+
+  const url = await WebUrl.findById(urlId);
+
+  if (!url) {
+    throw new apiError(404, "UrlId is not valid")
+  }
+
+  return res
+    .status(200)
+    .json(new apiResponse(200, url, "Url get successfully"))
+})
+
 const getAllUrls = asyncHandler(async (req, res) => {
   const urls = await WebUrl.aggregate([
     {
@@ -170,6 +187,10 @@ const checkUrls = asyncHandler(async (req, res) => {
 
   const urlCheck = await fetchUrl(urlDesc);
 
+  isExist.statusCodes.push({ urlCheckStatus: urlCheck.status, time: Date.now() });
+
+  await isExist.save({ validateBeforeSave: false });
+
   if (urlCheck.status >= 500) {
     const alertSend = await alertSender(urlDesc)
     if (!alertSend?.messageId) {
@@ -185,4 +206,4 @@ const checkUrls = asyncHandler(async (req, res) => {
     .json(new apiResponse(200, { urlstatus: urlCheck.status }, `your webisite is perfectly working with status code ${urlCheck.status}`))
 })
 
-export { addWebUrl, deleteUrl, editUrl, getAllUrls, checkUrls };
+export { addWebUrl, deleteUrl, editUrl, getAllUrls, checkUrls, getOneUrl };
