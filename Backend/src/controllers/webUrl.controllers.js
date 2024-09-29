@@ -25,7 +25,7 @@ const addWebUrl = asyncHandler(async (req, res) => {
 
   const response = await axios.get(url)
 
-  const webUrl = await WebUrl.create({ Urls: url, notificationType: notificationType, userId: req.user?._id, statusCode: response.status, statusCodes: { responseStatus: response.status, time: Date.now() } });
+  const webUrl = await WebUrl.create({ Urls: url, notificationType: notificationType, userId: req.user?._id, statusCode: response.status, statusCodes: response.status });
 
   if (!webUrl) {
     throw new apiError(
@@ -187,7 +187,7 @@ const checkUrls = asyncHandler(async (req, res) => {
 
   const urlCheck = await fetchUrl(urlDesc);
 
-  isExist.statusCodes.push({ urlCheckStatus: urlCheck.status, time: Date.now() });
+  isExist.statusCodes.push({ urlCheckStatus: urlCheck.status });
 
   await isExist.save({ validateBeforeSave: false });
 
