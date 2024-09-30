@@ -9,8 +9,11 @@ import WebsiteMoniter from './Dashboard/WebsiteMoniter.jsx';
 import SignUp from './Authentication/SignUp.jsx';
 import Login from './Authentication/Login.jsx'
 import { UserContextProvider } from './Context/UserContextProvider.jsx';
-import { DashboardContextProvider } from './Context/DashboardContextProvider.jsx';
+import { DashboardContextProvider, useDashboardContext } from './Context/DashboardContextProvider.jsx';
 import WebUrlDashboard from '../src/Dashboard/WebUrlDashboard.jsx'
+
+const theme = localStorage.getItem('theme')
+document.body.classList.add(theme)
 
 const router = createBrowserRouter([
   {

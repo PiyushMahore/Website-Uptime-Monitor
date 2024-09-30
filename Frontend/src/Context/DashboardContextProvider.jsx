@@ -72,6 +72,13 @@ export const DashboardContextProvider = (props) => {
         }
     }
 
+    setInterval(() => {
+        if (allUrls.length > 0) {
+            allUrls.map(async (data) => await fetchUrls(data))
+            console.log("Hwl");
+        }
+    }, 180000)
+
     return (
         <dashboardContext.Provider value={{ addUrl, allUrls, deleteUrl, getAllUrls, fetchUrls, getSingleUrl }}>
             {props.children}

@@ -7,10 +7,10 @@ import { MdDelete } from "react-icons/md";
 import DeleteUrlMenu from '../components/DeleteUrlMenu.jsx';
 import { useDashboardContext } from '../Context/DashboardContextProvider.jsx';
 import { MdRefresh } from "react-icons/md";
-import { NavLink, useParams } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
+import Loading from '../components/Loading.jsx';
 
 function WebsiteMoniter() {
-    const { id } = useParams()
     const useDashboard = useDashboardContext()
 
     const [webDisplay, setWebdisplay] = useState(true)
@@ -18,15 +18,13 @@ function WebsiteMoniter() {
     const [deleteForm, setDeleteForm] = useState(false)
     const [datetingUrl, setDatetingUrl] = useState(null)
 
-    const fetch = async () => {
+    useEffect(() => {
         if (useDashboard.allUrls.length > 0) {
-            await useDashboard.allUrls.map(async (data) => await useDashboard.fetchUrls(data))
+            useDashboard.allUrls.map(async (data) => await useDashboard.fetchUrls(data))
         }
-    }
+    }, [useDashboard.allUrls])
 
-    setInterval(() => {
-        fetch()
-    }, 180000)
+    if (useDashboard.allUrls.length < 1) return <Loading />
 
     return (
         <div className={`min-h-screen sm:px-[10%] sm:pt-[5%] px-4 py-4 dark:bg-[#222838] relative`}>

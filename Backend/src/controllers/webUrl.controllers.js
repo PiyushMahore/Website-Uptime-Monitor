@@ -187,7 +187,7 @@ const checkUrls = asyncHandler(async (req, res) => {
 
   const urlCheck = await fetchUrl(urlDesc);
 
-  isExist.statusCodes.push({ urlCheckStatus: urlCheck.status });
+  isExist.statusCodes.push(urlCheck.status);
 
   await isExist.save({ validateBeforeSave: false });
 

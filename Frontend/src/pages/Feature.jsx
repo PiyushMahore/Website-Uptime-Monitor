@@ -1,5 +1,5 @@
 import React from 'react'
-import FeatureImg from '../../public/FeaturedImg.jpg'
+import FeatureImg from '/FeaturedImg.jpg'
 
 function Feature() {
     return (
