@@ -8,55 +8,34 @@ function WebUrlDashboard() {
     const { urlId } = useParams()
     const useDashboard = useDashboardContext()
     const [url, setUrl] = useState([])
-    const [lastCheck, setLastCheck] = useState()
 
     useEffect(() => {
-        const gettingUrlData = async () => {
-            const data = await useDashboard.getSingleUrl(urlId)
-            setUrl(data)
-        }
-
-        gettingUrlData()
+        useDashboard.getSingleUrl(urlId)
+            .then((data) => setUrl(data))
     }, [])
 
+    let lastUpdated = new Date() - new Date(url.data?.updatedAt);
+    lastUpdated = Math.floor(lastUpdated / 1000);
+    console.log(lastUpdated);
+    let lastUpdatedAt = Math.floor((lastUpdated % (60 * 60)) / 60);
+
     setInterval(() => {
-        const gettingUrlData = async () => {
-            const data = await useDashboard.getSingleUrl(urlId)
-            setUrl(data)
-        }
-        gettingUrlData()
-    }, 180000);
+        useDashboard.getSingleUrl(urlId)
+            .then((data) => setUrl(data))
+    }, 60000);
 
     let addedSinceTime = new Date() - new Date(url.data?.createdAt)
     addedSinceTime = Math.floor(addedSinceTime / 1000);
-
     const days = Math.floor(addedSinceTime / (24 * 60 * 60));
     const hours = Math.floor((addedSinceTime % (24 * 60 * 60)) / (60 * 60));
     const minutes = Math.floor((addedSinceTime % (60 * 60)) / 60);
 
-    setInterval(async () => {
-        const urlDesc = await useDashboard.getSingleUrl(urlId)
-        const checkedSince = new Date() - new Date(urlDesc.data?.updatedAt)
-        const dataFormed = Math.floor(checkedSince / 1000);
-
-        const lastCheckMinutes = Math.floor((dataFormed % (60 * 60)) / 60);
-        setLastCheck(lastCheckMinutes)
-        console.log(lastCheckMinutes, lastCheck)
+    setInterval(() => {
+        let lastUpdated = new Date() - new Date(url.data?.updatedAt);
+        lastUpdated = Math.floor(lastUpdated / 1000);
+        console.log(lastUpdated, "form Interval");
+        lastUpdatedAt = Math.floor((lastUpdated % (60 * 60)) / 60);
     }, 60000);
-
-    useEffect(() => {
-        async function checkTime() {
-            const urlDesc = await useDashboard.getSingleUrl(urlId)
-            const checkedSince = new Date() - new Date(urlDesc.data?.updatedAt)
-            const dataFormed = Math.floor(checkedSince / 1000);
-
-            const lastCheckMinutes = Math.floor((dataFormed % (60 * 60)) / 60);
-            setLastCheck(lastCheckMinutes)
-            console.log(lastCheckMinutes, lastCheck)
-        }
-
-        checkTime()
-    }, [])
 
     if (url.length < 1) return <Loading />
 
@@ -76,7 +55,7 @@ function WebUrlDashboard() {
                 </div>
                 <div className='border border-gray-600 px-4 py-4 rounded-md sm:w-72 w-full'>
                     <p>Last checked at</p>
-                    <p className='text-xl font-semibold'>{lastCheck} minutes ago</p>
+                    <p className='text-xl font-semibold'>{lastUpdatedAt} minutes ago</p>
                 </div>
                 <div className='border border-gray-600 px-4 py-4 rounded-md sm:w-72 w-full'>
                     <p>Incidents</p>

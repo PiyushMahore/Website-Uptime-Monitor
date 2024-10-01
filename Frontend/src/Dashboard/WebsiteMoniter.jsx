@@ -8,7 +8,6 @@ import DeleteUrlMenu from '../components/DeleteUrlMenu.jsx';
 import { useDashboardContext } from '../Context/DashboardContextProvider.jsx';
 import { MdRefresh } from "react-icons/md";
 import { NavLink } from 'react-router-dom';
-import Loading from '../components/Loading.jsx';
 
 function WebsiteMoniter() {
     const useDashboard = useDashboardContext()
@@ -17,14 +16,6 @@ function WebsiteMoniter() {
     const [addUrlForm, setAddUrlForm] = useState(false)
     const [deleteForm, setDeleteForm] = useState(false)
     const [datetingUrl, setDatetingUrl] = useState(null)
-
-    useEffect(() => {
-        if (useDashboard.allUrls.length > 0) {
-            useDashboard.allUrls.map(async (data) => await useDashboard.fetchUrls(data))
-        }
-    }, [useDashboard.allUrls])
-
-    if (useDashboard.allUrls.length < 1) return <Loading />
 
     return (
         <div className={`min-h-screen sm:px-[10%] sm:pt-[5%] px-4 py-4 dark:bg-[#222838] relative`}>

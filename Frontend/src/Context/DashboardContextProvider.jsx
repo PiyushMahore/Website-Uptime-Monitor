@@ -5,6 +5,7 @@ const dashboardContext = createContext()
 
 export const DashboardContextProvider = (props) => {
     const [allUrls, setAllUrls] = useState([])
+    const [lastCheck, setLastCheck] = useState()
 
     const addUrl = async (Url, notificationType) => {
         try {
@@ -75,7 +76,6 @@ export const DashboardContextProvider = (props) => {
     setInterval(() => {
         if (allUrls.length > 0) {
             allUrls.map(async (data) => await fetchUrls(data))
-            console.log("Hwl");
         }
     }, 180000)
 
