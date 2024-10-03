@@ -16,8 +16,8 @@ function AddUrlForm({ toggleForm }) {
     }
 
     return (
-        <div className='dark:text-white text-black w-screen sm:w-fit absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 p-2 z-20'>
-            <div className='relative border border-black dark:bg-custom-gradient sm:px-32 px-1 py-16 rounded-md'>
+        <div className='dark:text-white dark:bg-[#222838] text-black w-screen rounded-md sm:w-fit bg-white absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 p-2 z-20 border border-gray-500'>
+            <div className='relative dark:bg-custom-gradient sm:px-32 px-1 py-16'>
                 <button className='absolute top-3 right-3 text-2xl hover:scale-110 duration-200' onClick={() => toggleForm(false)}><AiOutlineCloseCircle /></button>
                 <h1 className='text-center text-3xl'>Add URL:</h1>
                 <div>

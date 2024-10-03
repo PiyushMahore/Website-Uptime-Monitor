@@ -5,7 +5,6 @@ const dashboardContext = createContext()
 
 export const DashboardContextProvider = (props) => {
     const [allUrls, setAllUrls] = useState([])
-    const [lastCheck, setLastCheck] = useState()
 
     const addUrl = async (Url, notificationType) => {
         try {
@@ -51,18 +50,6 @@ export const DashboardContextProvider = (props) => {
         }
     }
 
-    const fetchUrls = async (urlDesc) => {
-        try {
-            const response = await axios.post(`http://localhost:3000/api/v1/webUrls/check-urls`, {
-                "urlDesc": urlDesc
-            })
-            return response.data;
-
-        } catch (error) {
-            console.log("Somthing went wrong while fetching URLs", error)
-        }
-    }
-
     const getSingleUrl = async (urlId) => {
         try {
             const response = await axios.get(`http://localhost:3000/api/v1/webUrls/get-single-url/${urlId}`)
@@ -73,14 +60,22 @@ export const DashboardContextProvider = (props) => {
         }
     }
 
-    setInterval(() => {
-        if (allUrls.length > 0) {
-            allUrls.map(async (data) => await fetchUrls(data))
+    const sendTestAlert = async (urlDesc, message, subject) => {
+        try {
+            const response = await axios.post(`http://localhost:3000/api/v1/webUrls/send-url-alert`, {
+                "urlDesc": urlDesc,
+                "message": message,
+                "subject": subject
+            })
+            return response.data
+
+        } catch (error) {
+            console.log("somthing went wrong while sending test alert")
         }
-    }, 180000)
+    }
 
     return (
-        <dashboardContext.Provider value={{ addUrl, allUrls, deleteUrl, getAllUrls, fetchUrls, getSingleUrl }}>
+        <dashboardContext.Provider value={{ addUrl, allUrls, deleteUrl, getAllUrls, getSingleUrl, sendTestAlert }}>
             {props.children}
         </dashboardContext.Provider>
     )

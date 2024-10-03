@@ -4,8 +4,8 @@ import { apiResponse } from "../utils/apiResponse.js";
 import { WebUrl } from "../models/webUrl.model.js";
 import mongoose from "mongoose";
 import axios from "axios";
-import { fetchUrl } from "../utils/urlFetcher.js";
-import { alertSender } from "../utils/alertSender.js";
+import { User } from "../models/user.model.js";
+import mailAlert from "../utils/emailAlert.js"
 
 const addWebUrl = asyncHandler(async (req, res) => {
   const { url, notificationType } = req.body;
@@ -172,38 +172,39 @@ const getAllUrls = asyncHandler(async (req, res) => {
     .json(new apiResponse(200, urls, "All web urls fetched successfully"));
 });
 
-const checkUrls = asyncHandler(async (req, res) => {
-  const { urlDesc } = req.body;
+const sendAlert = asyncHandler(async (req, res) => {
+  const { urlDesc, message, subject } = req.body;
 
   if (!urlDesc) {
-    throw new apiError(401, "no url to check")
+    throw new apiError(401, "url desc not provided")
   }
 
-  const isExist = await WebUrl.findById(urlDesc._id);
+  console.log(urlDesc, message, subject)
 
-  if (!isExist) {
-    throw new apiError(404, "given url is not valid")
+  const user = await User.findById(urlDesc.userId)
+
+  if (!user) {
+    throw new apiError(404, "cant find user from given user Id")
   }
 
-  const urlCheck = await fetchUrl(urlDesc);
+  let alert;
 
-  isExist.statusCodes.push(urlCheck.status);
+  if (urlDesc.notificationType === "email") {
+    alert = await mailAlert(user, subject, message)
+    console.log("ALert =", alert)
+  } else if (urlDesc.notificationType === "text") {
+    console.log("text")
+  } else {
+    console.log("call")
+  }
 
-  await isExist.save({ validateBeforeSave: false });
-
-  if (urlCheck.status >= 500) {
-    const alertSend = await alertSender(urlDesc)
-    if (!alertSend?.messageId) {
-      throw new apiError(500, "failed to send notification")
-    }
-    return res
-      .status(200)
-      .json(new apiResponse(200, { urlstatus: urlCheck.status }, `your webisite is not working with status code ${urlCheck.status} we have alerted to the owner of website`))
+  if (!alert) {
+    throw new apiError(500, "Somthing went wrong while sending alert")
   }
 
   return res
     .status(200)
-    .json(new apiResponse(200, { urlstatus: urlCheck.status }, `your webisite is perfectly working with status code ${urlCheck.status}`))
+    .json(new apiResponse(200, alert, "Alert send Successfully"))
 })
 
-export { addWebUrl, deleteUrl, editUrl, getAllUrls, checkUrls, getOneUrl };
+export { addWebUrl, deleteUrl, editUrl, getAllUrls, getOneUrl, sendAlert };
