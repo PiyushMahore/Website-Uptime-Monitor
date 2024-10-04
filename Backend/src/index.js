@@ -1,7 +1,7 @@
 import dbConnect from "./db/dbConnect.js"
 import { app } from "./app.js";
 import { WebUrl } from "./models/webUrl.model.js";
-import { checkUrls } from "./utils/urlFetch.js"
+import { checkUrls } from "./utils/urlChecker.js"
 
 const Port = process.env.PORT
 
@@ -23,15 +23,15 @@ dbConnect()
         console.log("sothing went rong", err);
     })
 
-const fetchingURls = async () => {
+const checkingUrls = async () => {
     const UrlDescs = await WebUrl.find({})
     UrlDescs.map(async (urlDesc) => {
         await checkUrls(urlDesc)
     })
 }
 
-fetchingURls()
+checkingUrls()
 
 setInterval(() => {
-    fetchingURls()
+    checkingUrls()
 }, 180000);

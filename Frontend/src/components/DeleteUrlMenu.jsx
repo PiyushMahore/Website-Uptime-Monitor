@@ -1,7 +1,7 @@
 import React from 'react'
 import { useDashboardContext } from '../Context/DashboardContextProvider'
 
-function DeleteUrlMenu({ cancel, url, getBack }) {
+function DeleteUrlMenu({ deleteForm, url, getBack }) {
     const useDashboard = useDashboardContext()
 
     return (
@@ -11,7 +11,7 @@ function DeleteUrlMenu({ cancel, url, getBack }) {
                 <button className='py-2 px-3 dark:bg-[#222838] border border-gray-500 rounded-md' onClick={() => cancel(false)}>Cancel</button>
                 <button onClick={() => {
                     useDashboard.deleteUrl(url)
-                    cancel(false)
+                    deleteForm(false)
                     window.location.reload()
                     if (getBack) {
                         window.history.back()

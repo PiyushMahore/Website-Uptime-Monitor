@@ -7,6 +7,7 @@ function AddUrlForm({ toggleForm }) {
 
     const [notificationType, setNotificationType] = useState("")
     const [url, setUrl] = useState("")
+
     const addUrl = async () => {
         if (notificationType === "") {
             throw Error("please slect alert option")

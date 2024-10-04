@@ -179,8 +179,6 @@ const sendAlert = asyncHandler(async (req, res) => {
     throw new apiError(401, "url desc not provided")
   }
 
-  console.log(urlDesc, message, subject)
-
   const user = await User.findById(urlDesc.userId)
 
   if (!user) {
@@ -191,7 +189,6 @@ const sendAlert = asyncHandler(async (req, res) => {
 
   if (urlDesc.notificationType === "email") {
     alert = await mailAlert(user, subject, message)
-    console.log("ALert =", alert)
   } else if (urlDesc.notificationType === "text") {
     console.log("text")
   } else {

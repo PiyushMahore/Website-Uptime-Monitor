@@ -5,12 +5,12 @@ import {
   createBrowserRouter,
   RouterProvider
 } from "react-router-dom";
-import WebsiteMoniter from './Dashboard/WebsiteMoniter.jsx';
+import UserDashboard from '../src/Dashboard/UserDashboard.jsx'
 import SignUp from './Authentication/SignUp.jsx';
 import Login from './Authentication/Login.jsx'
 import { UserContextProvider } from './Context/UserContextProvider.jsx';
-import { DashboardContextProvider, useDashboardContext } from './Context/DashboardContextProvider.jsx';
-import WebUrlDashboard from '../src/Dashboard/WebUrlDashboard.jsx'
+import { DashboardContextProvider } from './Context/DashboardContextProvider.jsx';
+import UrlDashboard from '../src/Dashboard/UrlDashboard.jsx'
 
 const theme = localStorage.getItem('theme')
 document.body.classList.add(theme)
@@ -30,11 +30,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/dashboard/:id",
-    element: <WebsiteMoniter />
+    element: <UserDashboard />
   },
   {
     path: '/url/:urlId',
-    element: <WebUrlDashboard />
+    element: <UrlDashboard />
   }
 ])
 

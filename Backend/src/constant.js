@@ -1,1 +1,1 @@
-export const db_Name = "websitetest"
+export const db_Name = "Uptime Monitor"

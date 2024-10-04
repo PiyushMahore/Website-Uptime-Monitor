@@ -8,7 +8,7 @@ function SignUp() {
     const theme = localStorage.getItem("theme")
     document.body.classList.add(theme)
 
-    const useContexts = useUserContext()
+    const useAuth = useUserContext()
     const navigate = useNavigate()
 
     const [fullName, setFullName] = useState("")
@@ -18,14 +18,14 @@ function SignUp() {
     const [mobileNumber, setMobileNumber] = useState("")
     const [coverImage, setCoverImage] = useState(null)
 
-    const handleSignUp = async () => {
-        const data = await useContexts.signUp(fullName, userName, email, password, mobileNumber, coverImage || "");
+    const signUp = async () => {
+        const data = await useAuth.signUp(fullName, userName, email, password, mobileNumber, coverImage || "");
         if (data) {
             navigate(`/dashboard/${data.data._id}`)
         }
     };
 
-    if (useContexts.loading) return <Loading />
+    if (useAuth.loading) return <Loading />
 
     return (
         <div className="flex h-screen flex-1 flex-col justify-center items-center px-6 py-12 lg:px-8">
@@ -159,7 +159,7 @@ function SignUp() {
 
                     <div className="pb-3">
                         <button
-                            onClick={handleSignUp}
+                            onClick={signUp}
                             type="submit"
                             className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                         >

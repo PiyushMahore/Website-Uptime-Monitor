@@ -34,13 +34,13 @@
 
 @keyframes shrinkGrow1 {
   0% {
-    transform: scale(2); /* Start at original size */
+    transform: scale(2.3); /* Start at original size */
   }
   50% {
     transform: scale(1); /* Shrink to 50% of original size */
   }
   100% {
-    transform: scale(2); /* Grow back to original size */
+    transform: scale(2.3); /* Grow back to original size */
   }
 }
 

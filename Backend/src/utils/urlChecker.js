@@ -17,6 +17,10 @@ const checkUrls = async (urlDesc) => {
 
     const urlCheck = await fetchUrl(urlDesc);
 
+    if (isExist.statusCodes.length >= 60) {
+        isExist.statusCodes.splice(0, 10);
+    }
+
     isExist.statusCodes.push(urlCheck.status);
 
     await isExist.save({ validateBeforeSave: false });

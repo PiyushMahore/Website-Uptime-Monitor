@@ -54,7 +54,7 @@ const BollingerChart = ({ initialData = [], initialLabels = [] }) => {
     };
 
     return (
-        <div className='border-l border-r border-b border-gray-600 p-4'>
+        <div className='border-l border-r border-b dark:border-gray-600 border-black p-4'>
             <Bar data={chartData} options={config.options} />
         </div>
     );

@@ -2,25 +2,24 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'
 import Loading from '../components/Loading';
 import { useUserContext } from '../Context/UserContextProvider';
-import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
 
 function Login() {
     const theme = localStorage.getItem("theme")
     document.body.classList.add(theme)
     const navigate = useNavigate()
-    const useContexts = useUserContext()
+    const useAuth = useUserContext()
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
 
     const logIn = async () => {
-        const data = await useContexts.login(email, password)
+        const data = await useAuth.login(email, password)
         if (data) {
             navigate(`/dashboard/${data.data._id}`)
         }
     }
 
-    if (useContexts.loading) return <Loading />
+    if (useAuth.loading) return <Loading />
 
     return (
         <div className="flex h-screen flex-1 flex-col justify-center items-center px-6 py-12 lg:px-8">

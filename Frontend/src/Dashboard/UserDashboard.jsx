@@ -8,32 +8,12 @@ import DeleteUrlMenu from '../components/DeleteUrlMenu.jsx';
 import { useDashboardContext } from '../Context/DashboardContextProvider.jsx';
 import { MdRefresh } from "react-icons/md";
 import { NavLink } from 'react-router-dom';
+import { useUserContext } from '../Context/UserContextProvider.jsx';
+import Loading from '../components/Loading.jsx';
 
-function WebsiteMoniter() {
+function UserDashboard() {
+    const useAuth = useUserContext()
     const useDashboard = useDashboardContext()
-
-    const greetingsAndQuestions = [
-        `Hello, ${useDashboard.allUrls[0]?.userAllWebUrls[0].fullName.split(" ")[0]}! How's your day going?`,
-        `Hi ${useDashboard.allUrls[0]?.userAllWebUrls[0].fullName.split(" ")[0]}, what's new with you today?`,
-        `Good to see you, ${useDashboard.allUrls[0]?.userAllWebUrls[0].fullName.split(" ")[0]}! Any exciting plans?`,
-        `Hey ${useDashboard.allUrls[0]?.userAllWebUrls[0].fullName.split(" ")[0]}! How have you been?`,
-        `Hi ${useDashboard.allUrls[0]?.userAllWebUrls[0].fullName.split(" ")[0]}, hope everything is going well!`,
-        `Good morning, ${useDashboard.allUrls[0]?.userAllWebUrls[0].fullName.split(" ")[0]}! How did you sleep?`,
-        `Hello ${useDashboard.allUrls[0]?.userAllWebUrls[0].fullName.split(" ")[0]}! Ready to tackle the day?`,
-        `Hey ${useDashboard.allUrls[0]?.userAllWebUrls[0].fullName.split(" ")[0]}, what are you working on today?`,
-        `Hi ${useDashboard.allUrls[0]?.userAllWebUrls[0].fullName.split(" ")[0]}, how's everything on your side?`,
-        `What's up, ${useDashboard.allUrls[0]?.userAllWebUrls[0].fullName.split(" ")[0]}? How's your week been?`,
-        `Good afternoon, ${useDashboard.allUrls[0]?.userAllWebUrls[0].fullName.split(" ")[0]}! What’s on your agenda?`,
-        `Evening, ${useDashboard.allUrls[0]?.userAllWebUrls[0].fullName.split(" ")[0]}! How was your day?`,
-        `Hi ${useDashboard.allUrls[0]?.userAllWebUrls[0].fullName.split(" ")[0]}, any new updates you'd like to share?`,
-        `Hey ${useDashboard.allUrls[0]?.userAllWebUrls[0].fullName.split(" ")[0]}! Long time no see, how have you been?`,
-        `Hello ${useDashboard.allUrls[0]?.userAllWebUrls[0].fullName.split(" ")[0]}! Have you done anything fun recently?`,
-        `Good evening, ${useDashboard.allUrls[0]?.userAllWebUrls[0].fullName.split(" ")[0]}! How's everything going?`,
-        `Hi ${useDashboard.allUrls[0]?.userAllWebUrls[0].fullName.split(" ")[0]}, did anything interesting happen today?`,
-        `Hey ${useDashboard.allUrls[0]?.userAllWebUrls[0].fullName.split(" ")[0]}! Got any fun plans for the weekend?`,
-        `Good day, ${useDashboard.allUrls[0]?.userAllWebUrls[0].fullName.split(" ")[0]}! How are you feeling today?`,
-        `Hello ${useDashboard.allUrls[0]?.userAllWebUrls[0].fullName.split(" ")[0]}, what’s been on your mind lately?`
-    ];
 
     const [webDisplay, setWebdisplay] = useState(true)
     const [addUrlForm, setAddUrlForm] = useState(false)
@@ -41,7 +21,41 @@ function WebsiteMoniter() {
     const [datetingUrl, setDatetingUrl] = useState(null)
     const [filterdUrls, setFilterdUrls] = useState([])
     const [searchInput, setSearchInput] = useState("")
-    const [randomQuteNum, setRandomQuteNum] = useState(Math.floor(Math.random() * 21))
+    const [randomQuteNum, setRandomQuteNum] = useState(0)
+    const [user, setUser] = useState("")
+
+    useEffect(() => {
+        setRandomQuteNum(Math.floor(Math.random() * 21))
+        useAuth.getCurrentUser()
+            .then((data) => setUser(data.data))
+    }, [])
+
+    let greetingsAndQuestions = []
+
+    if (user?.fullName) {
+        greetingsAndQuestions = [
+            `Hello, ${user?.fullName.split(" ")[0]}! How's your day going?`,
+            `Hi ${user?.fullName.split(" ")[0]}, what's new with you today?`,
+            `Good to see you, ${user?.fullName.split(" ")[0]}! Any exciting plans?`,
+            `Hey ${user?.fullName.split(" ")[0]}! How have you been?`,
+            `Hi ${user?.fullName.split(" ")[0]}, hope everything is going well!`,
+            `Good morning, ${user?.fullName.split(" ")[0]}! How did you sleep?`,
+            `Hello ${user?.fullName.split(" ")[0]}! Ready to tackle the day?`,
+            `Hey ${user?.fullName.split(" ")[0]}, what are you working on today?`,
+            `Hi ${user?.fullName.split(" ")[0]}, how's everything on your side?`,
+            `What's up, ${user?.fullName.split(" ")[0]}? How's your week been?`,
+            `Good afternoon, ${user?.fullName.split(" ")[0]}! What’s on your agenda?`,
+            `Evening, ${user?.fullName.split(" ")[0]}! How was your day?`,
+            `Hi ${user?.fullName.split(" ")[0]}, any new updates you'd like to share?`,
+            `Hey ${user?.fullName.split(" ")[0]}! Long time no see, how have you been?`,
+            `Hello ${user?.fullName.split(" ")[0]}! Have you done anything fun recently?`,
+            `Good evening, ${user?.fullName.split(" ")[0]}! How's everything going?`,
+            `Hi ${user?.fullName.split(" ")[0]}, did anything interesting happen today?`,
+            `Hey ${user?.fullName.split(" ")[0]}! Got any fun plans for the weekend?`,
+            `Good day, ${user?.fullName.split(" ")[0]}! How are you feeling today?`,
+            `Hello ${user?.fullName.split(" ")[0]}, what’s been on your mind lately?`
+        ];
+    }
 
     useEffect(() => {
         if (searchInput.trim() === "") {
@@ -51,6 +65,8 @@ function WebsiteMoniter() {
             setFilterdUrls(filteredOne)
         }
     }, [useDashboard.allUrls, searchInput])
+
+    if (!user) return <Loading />
 
     return (
         <div className={`min-h-screen sm:px-[10%] sm:pt-[5%] px-4 py-4 dark:bg-[#222838] relative`}>
@@ -86,8 +102,8 @@ function WebsiteMoniter() {
                                     <div className='pl-12 py-3'>
                                         <div className='flex items-center justify-between sm:pr-24'>
                                             <NavLink to={`/url/${data._id}`} className='flex items-center gap-7'>
-                                                <div className={`w-2.5 h-2.5 ${data.statusCode >= 500 ? "bg-red-700" : "dark:bg-green-700"} rounded-full relative z-20`}></div>
-                                                <div className={`w-2.5 h-2.5 ${data.statusCode >= 500 ? "bg-red-300" : "dark:bg-green-300"} rounded-full shrink-animation z-10 ${webDisplay ? "absolute" : "hidden"}`}></div>
+                                                <div className={`w-2.5 h-2.5 ${data.statusCode >= 500 ? "bg-red-700" : "bg-green-700"} rounded-full relative z-20`}></div>
+                                                <div className={`w-2.5 h-2.5 ${data.statusCode >= 500 ? "bg-red-300" : "bg-green-300"} rounded-full shrink-animation z-10 ${webDisplay ? "absolute" : "hidden"}`}></div>
                                                 <div className='text-sm'>
                                                     <p className='font-bold break-words w-60 sm:w-[550px] 2xl:w-full'>{data.Urls}</p>
                                                     <p className='text-green-600'>Up<span className='dark:text-gray-400 text-gray-600 ml-2 text-xs'>{`· ${data.createdAt.slice(0, 10)}`}</span></p>
@@ -121,4 +137,4 @@ function WebsiteMoniter() {
     )
 }
 
-export default WebsiteMoniter
+export default UserDashboard
