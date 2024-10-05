@@ -24,7 +24,7 @@
     transform: scale(2); /* Shrink to 50% of original size */
   }
   100% {
-    transform: scale(1); /* Grow back to original size */
+    transform: scale(0.5); /* Grow back to original size */
   }
 }
 

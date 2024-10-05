@@ -11,6 +11,8 @@ import Login from './Authentication/Login.jsx'
 import { UserContextProvider } from './Context/UserContextProvider.jsx';
 import { DashboardContextProvider } from './Context/DashboardContextProvider.jsx';
 import UrlDashboard from '../src/Dashboard/UrlDashboard.jsx'
+import Dashboard from './Dashboard/Dashboard.jsx';
+import ForgetPassword from './Authentication/ForgetPassword.jsx';
 
 const theme = localStorage.getItem('theme')
 document.body.classList.add(theme)
@@ -29,13 +31,23 @@ const router = createBrowserRouter([
     element: <Login />
   },
   {
-    path: "/dashboard/:id",
-    element: <UserDashboard />
+    path: "/reset-password",
+    element: <ForgetPassword />
   },
   {
-    path: '/url/:urlId',
-    element: <UrlDashboard />
-  }
+    path: "/dashboard/:id",
+    element: <Dashboard />,
+    children: [
+      {
+        path: "",
+        element: <UserDashboard />
+      },
+      {
+        path: 'url/:urlId',
+        element: <UrlDashboard />
+      }
+    ]
+  },
 ])
 
 createRoot(document.getElementById('root')).render(

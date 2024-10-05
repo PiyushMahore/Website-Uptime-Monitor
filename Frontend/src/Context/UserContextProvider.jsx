@@ -53,7 +53,7 @@ export const UserContextProvider = (props) => {
 
         } catch (error) {
             setLoading(false)
-            console.log("Error in Login", error)
+            return "Password is Wrong"
         }
     };
 
@@ -68,8 +68,22 @@ export const UserContextProvider = (props) => {
         }
     }
 
+    async function resetPassword(email, message, subject) {
+        try {
+            const response = await axios.post('http://localhost:3000/api/v1/user/reset-password', {
+                "email": email,
+                "message": message,
+                "subject": subject
+            })
+            return response.data
+
+        } catch (error) {
+            return 'invalid Crediantials'
+        }
+    }
+
     return (
-        <userContext.Provider value={{ loading, login, signUp, getCurrentUser }}>
+        <userContext.Provider value={{ loading, login, signUp, getCurrentUser, resetPassword }}>
             {props.children}
         </userContext.Provider>
     )

@@ -101,9 +101,9 @@ function UserDashboard() {
                                 <span key={data._id}>
                                     <div className='pl-12 py-3'>
                                         <div className='flex items-center justify-between sm:pr-24'>
-                                            <NavLink to={`/url/${data._id}`} className='flex items-center gap-7'>
-                                                <div className={`w-2.5 h-2.5 ${data.statusCode >= 500 ? "bg-red-700" : "bg-green-700"} rounded-full relative z-20`}></div>
-                                                <div className={`w-2.5 h-2.5 ${data.statusCode >= 500 ? "bg-red-300" : "bg-green-300"} rounded-full shrink-animation z-10 ${webDisplay ? "absolute" : "hidden"}`}></div>
+                                            <NavLink to={`url/${data._id}`} className='flex items-center gap-7'>
+                                                <div className={`w-3 h-3 ${data.statusCode >= 500 ? "bg-red-700" : "bg-green-700"} rounded-full relative z-20`}></div>
+                                                <div className={`w-3 h-3 ${data.statusCode >= 500 ? "bg-red-300" : "bg-green-300"} rounded-full shrink-animation z-10 ${webDisplay ? "absolute" : "hidden"}`}></div>
                                                 <div className='text-sm'>
                                                     <p className='font-bold break-words w-60 sm:w-[550px] 2xl:w-full'>{data.Urls}</p>
                                                     <p className='text-green-600'>Up<span className='dark:text-gray-400 text-gray-600 ml-2 text-xs'>{`· ${data.createdAt.slice(0, 10)}`}</span></p>

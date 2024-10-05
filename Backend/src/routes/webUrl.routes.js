@@ -1,6 +1,6 @@
 import { Router } from "express";
 import verifyJwt from "../middlewares/verifyJwt.middleware.js"
-import { addWebUrl, deleteUrl, editUrl, getAllUrls, getOneUrl, sendAlert } from "../controllers/webUrl.controllers.js";
+import { addWebUrl, deleteUrl, editUrl, fetchUrl, getAllUrls, getOneUrl, sendAlert } from "../controllers/webUrl.controllers.js";
 
 const webUrlRoute = Router()
 
@@ -15,5 +15,7 @@ webUrlRoute.route('/get-website-url').get(verifyJwt, getAllUrls)
 webUrlRoute.route('/get-single-url/:urlId').get(getOneUrl)
 
 webUrlRoute.route('/send-url-alert').post(sendAlert)
+
+webUrlRoute.route('/check-url').post(fetchUrl)
 
 export { webUrlRoute }

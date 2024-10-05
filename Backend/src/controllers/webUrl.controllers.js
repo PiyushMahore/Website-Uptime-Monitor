@@ -204,4 +204,21 @@ const sendAlert = asyncHandler(async (req, res) => {
     .json(new apiResponse(200, alert, "Alert send Successfully"))
 })
 
-export { addWebUrl, deleteUrl, editUrl, getAllUrls, getOneUrl, sendAlert };
+const fetchUrl = asyncHandler(async (req, res) => {
+  const { url } = req.body
+
+  if (!url) return null
+
+  try {
+    const response = await axios.get(url)
+    if (response.status >= 500) {
+      return res.status(200).json(new apiResponse(200, response.status, `Your Website is currently Down the Status Code is ${response.status}`))
+    }
+    return res.status(200).json(new apiResponse(200, response.status, `Your Website is Perfectly Working With Status Code ${response.status}`))
+
+  } catch (error) {
+    throw new apiError(500, "Unable to fetch url")
+  }
+})
+
+export { addWebUrl, deleteUrl, editUrl, getAllUrls, getOneUrl, sendAlert, fetchUrl };

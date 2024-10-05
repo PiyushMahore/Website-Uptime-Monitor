@@ -74,8 +74,20 @@ export const DashboardContextProvider = (props) => {
         }
     }
 
+    const checkUrl = async (url) => {
+        try {
+            const response = await axios.post('http://localhost:3000/api/v1/webUrls/check-url', {
+                "url": url
+            })
+            return response.data
+
+        } catch (error) {
+            console.log("somthing went wrong while checking url")
+        }
+    }
+
     return (
-        <dashboardContext.Provider value={{ addUrl, allUrls, deleteUrl, getAllUrls, getSingleUrl, sendTestAlert }}>
+        <dashboardContext.Provider value={{ addUrl, allUrls, deleteUrl, getAllUrls, getSingleUrl, sendTestAlert, checkUrl }}>
             {props.children}
         </dashboardContext.Provider>
     )

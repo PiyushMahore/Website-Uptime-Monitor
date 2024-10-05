@@ -3,7 +3,9 @@ import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import { User } from "../models/user.model.js";
 import { uploadToCloudinary } from "../utils/cloudinary.js"
+import mailAlert from "../utils/emailAlert.js"
 import mongoose from "mongoose";
+import { use } from "bcrypt/promises.js";
 
 const cookieOptions = {
     httpOnly: true,
@@ -81,13 +83,17 @@ const logIn = asyncHandler(async (req, res) => {
     })
 
     if (!correctOrNot) {
-        throw new apiError(404, "user not found")
+        return res
+            .status(200)
+            .json(new apiResponse(200, "user not found", "user not found"))
     }
 
     const passwordCheck = await correctOrNot.changePassword(password)
 
     if (passwordCheck === false) {
-        throw new apiError(401, "password is wrong")
+        return res
+            .status(400)
+            .json(new apiResponse(400, "Password is Wrong", "Your given password is incorrect"))
     }
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(correctOrNot._id)
@@ -205,4 +211,30 @@ const getUserWebUrls = asyncHandler(async (req, res) => {
         .json(new apiResponse(200, webUrls, "web Urls fetched successfully"))
 })
 
-export { signUp, logIn, logOut, getCurrentUser, updateUserDetails, getUserWebUrls }
+const resetPassword = asyncHandler(async (req, res) => {
+    const { email, message, subject } = req.body;
+
+    if (!email) {
+        throw new apiError(401, "email is not provided")
+    }
+
+    const user = await User.findOne({ "email": email })
+
+    if (!user) {
+        return res
+            .status(404)
+            .json(new apiResponse(404, "User Not Found Tith This Email"))
+    }
+
+    const alert = await mailAlert(user, subject, message)
+
+    if (!alert) {
+        throw new apiError(500, "Somthing went wrong while sending alert")
+    }
+
+    return res
+        .status(200)
+        .json(new apiResponse(200, alert, "Alert send Successfully"))
+})
+
+export { signUp, logIn, logOut, getCurrentUser, updateUserDetails, getUserWebUrls, resetPassword }
