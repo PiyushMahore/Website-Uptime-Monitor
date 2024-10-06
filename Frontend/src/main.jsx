@@ -11,44 +11,42 @@ import Login from './Authentication/Login.jsx'
 import { UserContextProvider } from './Context/UserContextProvider.jsx';
 import { DashboardContextProvider } from './Context/DashboardContextProvider.jsx';
 import UrlDashboard from '../src/Dashboard/UrlDashboard.jsx'
-import Dashboard from './Dashboard/Dashboard.jsx';
-import ForgetPassword from './Authentication/ForgetPassword.jsx';
+import Verify from './Authentication/Verify.jsx';
+import CreateNewPassword from './Authentication/CreateNewPassword.jsx';
 
 const theme = localStorage.getItem('theme')
 document.body.classList.add(theme)
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <App />
   },
   {
-    path: "/sign-up",
+    path: '/sign-up',
     element: <SignUp />
   },
   {
-    path: "/login",
+    path: '/login',
     element: <Login />
   },
   {
-    path: "/reset-password",
-    element: <ForgetPassword />
+    path: '/login/reset-password',
+    element: <Verify />
   },
   {
-    path: "/dashboard/:id",
-    element: <Dashboard />,
-    children: [
-      {
-        path: "",
-        element: <UserDashboard />
-      },
-      {
-        path: 'url/:urlId',
-        element: <UrlDashboard />
-      }
-    ]
+    path: '/login/create-new-password/:email',
+    element: <CreateNewPassword />
   },
-])
+  {
+    path: '/dashboard/user/:id',
+    element: <UserDashboard />
+  },
+  {
+    path: '/dashboard/:id/url/:urlId',
+    element: <UrlDashboard />
+  }
+]);
 
 createRoot(document.getElementById('root')).render(
   <UserContextProvider>

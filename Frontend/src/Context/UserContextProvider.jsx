@@ -27,11 +27,15 @@ export const UserContextProvider = (props) => {
                 withCredentials: true, // Ensure cookies are sent with the request
             });
 
-            setLoading(false);
+            setTimeout(() => {
+                setLoading(false)
+            }, 500);
             return response.data;
 
         } catch (error) {
-            setLoading(false);
+            setTimeout(() => {
+                setLoading(false)
+            }, 500);
             console.error('Error in SignUp:', error);
             // Optionally, handle the error, e.g., by setting an error state
             throw error; // Re-throwing the error might be useful for further handling
@@ -48,42 +52,80 @@ export const UserContextProvider = (props) => {
             }, {
                 withCredentials: true, // Ensure cookies are sent with the request
             });
-            setLoading(false)
+            setTimeout(() => {
+                setLoading(false)
+            }, 500);
             return response.data
 
         } catch (error) {
-            setLoading(false)
+            setTimeout(() => {
+                setLoading(false)
+            }, 500);
             return "Password is Wrong"
         }
     };
 
     async function getCurrentUser() {
+        setLoading(true)
         try {
             const response = await axios.get('http://localhost:3000/api/v1/user/current-user', {
                 withCredentials: true, // This ensures cookies are sent with the request
             });
+            setTimeout(() => {
+                setLoading(false)
+            }, 500);
             return response.data;
         } catch (error) {
+            setTimeout(() => {
+                setLoading(false)
+            }, 500);
             console.log('You are not logged in please login for more features')
         }
     }
 
-    async function resetPassword(email, message, subject) {
+    async function generateOtp(email, message, subject) {
+        setLoading(true)
         try {
-            const response = await axios.post('http://localhost:3000/api/v1/user/reset-password', {
+            const response = await axios.post('http://localhost:3000/api/v1/user/generate-otp', {
                 "email": email,
                 "message": message,
                 "subject": subject
             })
+            setTimeout(() => {
+                setLoading(false)
+            }, 500);
             return response.data
 
         } catch (error) {
+            setTimeout(() => {
+                setLoading(false)
+            }, 500);
             return 'invalid Crediantials'
         }
     }
 
+    async function resetPassword(email, password) {
+        setLoading(true)
+        try {
+            const response = await axios.patch(`http://localhost:3000/api/v1/user/reset-password`, {
+                "email": email,
+                "password": password
+            })
+            setTimeout(() => {
+                setLoading(false)
+            }, 500);
+            return response.data
+
+        } catch (error) {
+            setTimeout(() => {
+                setLoading(false)
+            }, 500);
+            return 'unable to change password'
+        }
+    }
+
     return (
-        <userContext.Provider value={{ loading, login, signUp, getCurrentUser, resetPassword }}>
+        <userContext.Provider value={{ loading, setLoading, login, signUp, getCurrentUser, generateOtp, resetPassword }}>
             {props.children}
         </userContext.Provider>
     )

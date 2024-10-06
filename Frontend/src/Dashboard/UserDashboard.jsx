@@ -10,6 +10,7 @@ import { MdRefresh } from "react-icons/md";
 import { NavLink } from 'react-router-dom';
 import { useUserContext } from '../Context/UserContextProvider.jsx';
 import Loading from '../components/Loading.jsx';
+import { CiMenuKebab } from "react-icons/ci";
 
 function UserDashboard() {
     const useAuth = useUserContext()
@@ -22,7 +23,7 @@ function UserDashboard() {
     const [filterdUrls, setFilterdUrls] = useState([])
     const [searchInput, setSearchInput] = useState("")
     const [randomQuteNum, setRandomQuteNum] = useState(0)
-    const [user, setUser] = useState("")
+    const [user, setUser] = useState()
 
     useEffect(() => {
         setRandomQuteNum(Math.floor(Math.random() * 21))
@@ -69,14 +70,14 @@ function UserDashboard() {
     if (!user) return <Loading />
 
     return (
-        <div className={`min-h-screen sm:px-[10%] sm:pt-[5%] px-4 py-4 dark:bg-[#222838] relative`}>
-            <div className={`flex justify-start ${addUrlForm || deleteForm ? "blur-sm" : ""}`}>
-                <div className='flex sm:gap-16 gap-6 flex-wrap'>
+        <div className={`min-h-screen sm:px-[10%] px-4 dark:bg-[#222838] relative`}>
+            <div className={`flex justify-start ${addUrlForm || deleteForm ? "blur-sm" : ""} sm:pt-[5%] py-4`}>
+                <div className='flex sm:gap-16 gap-6 flex-wrap items-center'>
                     <h1 className='sm:text-3xl text-lg font-bold'>{greetingsAndQuestions[randomQuteNum]}</h1>
                     <div className='flex flex-col sm:flex-row justify-start gap-6 items-start sm:items-center'>
                         <div className='flex items-center dark:text-gray-500 text-black'>
                             <div className='absolute ml-2'><IoIosSearch /></div>
-                            <input value={searchInput} onChange={(e) => setSearchInput(e.target.value)} placeholder='Search' className='pl-8 h-8 w-72 rounded-lg focus:outline-none border border-gray-500 inputShadow dark:bg-[#222838] dark:text-white' type="search" />
+                            <input value={searchInput} onChange={(e) => setSearchInput(e.target.value)} placeholder='Search' className='pl-8 pr-1.5 h-8 w-72 rounded-lg focus:outline-none border border-gray-500 inputShadow dark:bg-[#222838] dark:text-white' type="search" />
                         </div>
                         <button onClick={() => setAddUrlForm(true)} className='bg-[#5B63D3] rounded-lg hover:bg-[#3788d8] px-4 py-1.5'>Create monitor</button>
                     </div>
@@ -101,7 +102,7 @@ function UserDashboard() {
                                 <span key={data._id}>
                                     <div className='pl-12 py-3'>
                                         <div className='flex items-center justify-between sm:pr-24'>
-                                            <NavLink to={`url/${data._id}`} className='flex items-center gap-7'>
+                                            <NavLink to={`/dashboard/${user._id}/url/${data._id}`} className='flex items-center gap-7'>
                                                 <div className={`w-3 h-3 ${data.statusCode >= 500 ? "bg-red-700" : "bg-green-700"} rounded-full relative z-20`}></div>
                                                 <div className={`w-3 h-3 ${data.statusCode >= 500 ? "bg-red-300" : "bg-green-300"} rounded-full shrink-animation z-10 ${webDisplay ? "absolute" : "hidden"}`}></div>
                                                 <div className='text-sm'>
@@ -128,7 +129,7 @@ function UserDashboard() {
                             ))
                         }
 
-                        {deleteForm ? <DeleteUrlMenu cancel={setDeleteForm} url={datetingUrl} /> : ""}
+                        {deleteForm ? <DeleteUrlMenu deleteForm={setDeleteForm} url={datetingUrl} /> : ""}
 
                     </div>
                 </div>

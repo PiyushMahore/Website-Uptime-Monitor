@@ -26,7 +26,7 @@ function App() {
     fetchUser();
   }, []);
 
-  if (user) return <Navigate to={`/dashboard/${user.data._id}`} />
+  if (user) return <Navigate to={`/dashboard/user/${user.data._id}`} />
 
   return (
     <div>

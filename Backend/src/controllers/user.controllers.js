@@ -5,7 +5,6 @@ import { User } from "../models/user.model.js";
 import { uploadToCloudinary } from "../utils/cloudinary.js"
 import mailAlert from "../utils/emailAlert.js"
 import mongoose from "mongoose";
-import { use } from "bcrypt/promises.js";
 
 const cookieOptions = {
     httpOnly: true,
@@ -174,6 +173,32 @@ const updateUserDetails = asyncHandler(async (req, res) => {
         .json(new apiResponse(200, user, "user details updated successfully"))
 })
 
+const resetPassword = asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email) {
+        throw new apiError(400, "email is required to changePassword")
+    }
+
+    if (!password) {
+        throw new apiError(400, "password is required")
+    }
+
+    const user = await User.findOne({ email: email })
+
+    if (!user) {
+        throw new apiError(400, "Invalid crediantials")
+    }
+
+    user.password = password
+
+    await user.save()
+
+    return res
+        .status(200)
+        .json(new apiResponse(200, user, "Password changed successfully"))
+})
+
 const getUserWebUrls = asyncHandler(async (req, res) => {
     const webUrls = await User.aggregate([
         {
@@ -211,7 +236,7 @@ const getUserWebUrls = asyncHandler(async (req, res) => {
         .json(new apiResponse(200, webUrls, "web Urls fetched successfully"))
 })
 
-const resetPassword = asyncHandler(async (req, res) => {
+const generateOtp = asyncHandler(async (req, res) => {
     const { email, message, subject } = req.body;
 
     if (!email) {
@@ -237,4 +262,4 @@ const resetPassword = asyncHandler(async (req, res) => {
         .json(new apiResponse(200, alert, "Alert send Successfully"))
 })
 
-export { signUp, logIn, logOut, getCurrentUser, updateUserDetails, getUserWebUrls, resetPassword }
+export { signUp, logIn, logOut, getCurrentUser, updateUserDetails, getUserWebUrls, generateOtp, resetPassword }
