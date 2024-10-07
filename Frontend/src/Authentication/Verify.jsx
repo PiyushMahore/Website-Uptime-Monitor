@@ -49,7 +49,7 @@ function Verify() {
         <div className='max-h-screen overflow-hidden'>
             <div>
                 <span className='flex px-2 py-2'><IoMdArrowBack onClick={() => window.history.back()} size={25} /></span>
-                <hr />
+                <hr className='border border-black dark:border-gray-300' />
             </div>
             <div className="flex sm:h-screen flex-1 flex-col justify-center items-center px-6 py-12 lg:px-8">
                 <div className="sm:mx-auto sm:w-full sm:max-w-sm">

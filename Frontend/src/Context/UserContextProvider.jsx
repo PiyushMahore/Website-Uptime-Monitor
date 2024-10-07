@@ -1,10 +1,11 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 
 const userContext = createContext();
 
 export const UserContextProvider = (props) => {
     const [loading, setLoading] = useState(false)
+    const [user, setUser] = useState()
 
     const signUp = async (fullName, userName, email, password, mobileNumber, coverImage) => {
         try {
@@ -125,6 +126,7 @@ export const UserContextProvider = (props) => {
     }
 
     async function updateUser(userName, password, newPassword, email, mobileNumber, fullName) {
+        setLoading(true)
         try {
             const response = await axios.patch(`http://localhost:3000/api/v1/user/update-user`,
                 {
@@ -136,11 +138,17 @@ export const UserContextProvider = (props) => {
                     fullName: fullName || ""
                 },
                 {
-                    withCredentials: true // This should be in the config, not in the data
+                    withCredentials: true
                 });
+            setTimeout(() => {
+                setLoading(false)
+            }, 500);
             return response;
 
         } catch (error) {
+            setTimeout(() => {
+                setLoading(false)
+            }, 500);
             return 'unable to update user'
         }
     }
@@ -150,6 +158,7 @@ export const UserContextProvider = (props) => {
             const response = await axios.post(`http://localhost:3000/api/v1/user/logout`, {}, {
                 withCredentials: true
             })
+                .then(() => setUser())
             return response;
 
         } catch (error) {
@@ -157,8 +166,13 @@ export const UserContextProvider = (props) => {
         }
     }
 
+    useEffect(() => {
+        getCurrentUser()
+            .then((user) => setUser(user.data))
+    }, [])
+
     return (
-        <userContext.Provider value={{ loading, setLoading, login, signUp, getCurrentUser, generateOtp, resetPassword, updateUser, logOut }}>
+        <userContext.Provider value={{ loading, setLoading, login, signUp, getCurrentUser, generateOtp, resetPassword, updateUser, logOut, user }}>
             {props.children}
         </userContext.Provider>
     )

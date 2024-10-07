@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import './App.css'
 import Feature from './pages/Feature'
 import Alerts from './pages/Alerts'
@@ -8,25 +8,10 @@ import { useUserContext } from './Context/UserContextProvider'
 import { Navigate } from 'react-router'
 
 function App() {
-  const useUser = useUserContext()
-  const [user, setUser] = useState(null)
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const currentUser = await useUser.getCurrentUser();
-        setUser(currentUser);
-        setLoading(false);
+  const useAuth = useUserContext()
 
-      } catch (error) {
-        console.log("you are not logged in please login or register account");
-      }
-    };
-
-    fetchUser();
-  }, []);
-
-  if (user) return <Navigate to={`/dashboard/user/${user.data._id}`} />
+  if (useAuth.user) return <Navigate to={`/dashboard/user/${useAuth.user._id}`} />
 
   return (
     <div>

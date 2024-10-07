@@ -23,35 +23,32 @@ function UserDashboard() {
     const [filterdUrls, setFilterdUrls] = useState([])
     const [searchInput, setSearchInput] = useState("")
     const [randomQuteNum, setRandomQuteNum] = useState(0)
-    const [user, setUser] = useState()
 
     useEffect(() => {
         setRandomQuteNum(Math.floor(Math.random() * 21))
-        useAuth.getCurrentUser()
-            .then((data) => setUser(data.data))
     }, [])
 
     let greetingsAndQuestions = [
-        `Hello, ${user?.fullName.split(" ")[0]}! How's your day going?`,
-        `Hi ${user?.fullName.split(" ")[0]}, what's new with you today?`,
-        `Good to see you, ${user?.fullName.split(" ")[0]}! Any exciting plans?`,
-        `Hey ${user?.fullName.split(" ")[0]}! How have you been?`,
-        `Hi ${user?.fullName.split(" ")[0]}, hope everything is going well!`,
-        `Good morning, ${user?.fullName.split(" ")[0]}! How did you sleep?`,
-        `Hello ${user?.fullName.split(" ")[0]}! Ready to tackle the day?`,
-        `Hey ${user?.fullName.split(" ")[0]}, what are you working on today?`,
-        `Hi ${user?.fullName.split(" ")[0]}, how's everything on your side?`,
-        `What's up, ${user?.fullName.split(" ")[0]}? How's your week been?`,
-        `Good afternoon, ${user?.fullName.split(" ")[0]}! What’s on your agenda?`,
-        `Evening, ${user?.fullName.split(" ")[0]}! How was your day?`,
-        `Hi ${user?.fullName.split(" ")[0]}, any new updates you'd like to share?`,
-        `Hey ${user?.fullName.split(" ")[0]}! Long time no see, how have you been?`,
-        `Hello ${user?.fullName.split(" ")[0]}! Have you done anything fun recently?`,
-        `Good evening, ${user?.fullName.split(" ")[0]}! How's everything going?`,
-        `Hi ${user?.fullName.split(" ")[0]}, did anything interesting happen today?`,
-        `Hey ${user?.fullName.split(" ")[0]}! Got any fun plans for the weekend?`,
-        `Good day, ${user?.fullName.split(" ")[0]}! How are you feeling today?`,
-        `Hello ${user?.fullName.split(" ")[0]}, what’s been on your mind lately?`
+        `Hello, ${useAuth.user?.fullName.split(" ")[0]}! How's your day going?`,
+        `Hi ${useAuth.user?.fullName.split(" ")[0]}, what's new with you today?`,
+        `Good to see you, ${useAuth.user?.fullName.split(" ")[0]}! Any exciting plans?`,
+        `Hey ${useAuth.user?.fullName.split(" ")[0]}! How have you been?`,
+        `Hi ${useAuth.user?.fullName.split(" ")[0]}, hope everything is going well!`,
+        `Good morning, ${useAuth.user?.fullName.split(" ")[0]}! How did you sleep?`,
+        `Hello ${useAuth.user?.fullName.split(" ")[0]}! Ready to tackle the day?`,
+        `Hey ${useAuth.user?.fullName.split(" ")[0]}, what are you working on today?`,
+        `Hi ${useAuth.user?.fullName.split(" ")[0]}, how's everything on your side?`,
+        `What's up, ${useAuth.user?.fullName.split(" ")[0]}? How's your week been?`,
+        `Good afternoon, ${useAuth.user?.fullName.split(" ")[0]}! What’s on your agenda?`,
+        `Evening, ${useAuth.user?.fullName.split(" ")[0]}! How was your day?`,
+        `Hi ${useAuth.user?.fullName.split(" ")[0]}, any new updates you'd like to share?`,
+        `Hey ${useAuth.user?.fullName.split(" ")[0]}! Long time no see, how have you been?`,
+        `Hello ${useAuth.user?.fullName.split(" ")[0]}! Have you done anything fun recently?`,
+        `Good evening, ${useAuth.user?.fullName.split(" ")[0]}! How's everything going?`,
+        `Hi ${useAuth.user?.fullName.split(" ")[0]}, did anything interesting happen today?`,
+        `Hey ${useAuth.user?.fullName.split(" ")[0]}! Got any fun plans for the weekend?`,
+        `Good day, ${useAuth.user?.fullName.split(" ")[0]}! How are you feeling today?`,
+        `Hello ${useAuth.user?.fullName.split(" ")[0]}, what’s been on your mind lately?`
     ];
 
     useEffect(() => {
@@ -63,14 +60,14 @@ function UserDashboard() {
         }
     }, [useDashboard.allUrls, searchInput])
 
-    if (!user) return <Loading />
+    if (!useAuth.user) return <Loading />
 
     return (
         <div className='min-h-screen dark:bg-[#222838]'>
             <div className='sm:px-8 p-2 py-2'>
-                <NavLink to={`/dashboard/profile/${user._id}`}><CgProfile size={30} /></NavLink>
+                <NavLink to={`/dashboard/profile/${useAuth.user._id}`}><CgProfile size={30} /></NavLink>
             </div>
-            <hr />
+            <hr className='border border-black dark:border-gray-300' />
             <div className={`min-h-screen sm:px-[10%] px-4 dark:bg-[#222838] relative`}>
                 <div className={`flex justify-start ${addUrlForm || deleteForm ? "blur-sm" : ""} sm:pt-[5%] py-4`}>
                     <div className='flex sm:gap-16 gap-6 flex-wrap items-center'>
@@ -103,7 +100,7 @@ function UserDashboard() {
                                     <span key={data._id}>
                                         <div className='pl-12 py-3'>
                                             <div className='flex items-center justify-between sm:pr-24'>
-                                                <NavLink to={`/dashboard/${user._id}/url/${data._id}`} className='flex items-center gap-7'>
+                                                <NavLink to={`/dashboard/${useAuth.user._id}/url/${data._id}`} className='flex items-center gap-7'>
                                                     <div className={`w-3 h-3 ${data.statusCode >= 500 ? "bg-red-700" : "bg-green-700"} rounded-full relative z-20`}></div>
                                                     <div className={`w-3 h-3 ${data.statusCode >= 500 ? "bg-red-300" : "bg-green-300"} rounded-full shrink-animation z-10 ${webDisplay ? "absolute" : "hidden"}`}></div>
                                                     <div className='text-sm'>

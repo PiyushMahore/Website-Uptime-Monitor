@@ -83,7 +83,7 @@ function UrlDashboard() {
         <div className='dark:bg-[#1F2433]'>
             <div>
                 <span className='flex px-2 py-2'><IoMdArrowBack onClick={() => window.history.back()} size={25} /></span>
-                <hr />
+                <hr className='border border-black dark:border-gray-300' />
             </div>
             <div className='dark:bg-[#1F2433] overflow-hidden sm:px-32 p-8 px-4'>
                 <div className='flex items-center gap-4 my-8'>

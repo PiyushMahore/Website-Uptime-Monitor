@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import Loading from "../components/Loading";
 import { useNavigate } from "react-router";
 import { useUserContext } from "../Context/UserContextProvider";
 import { NavLink } from "react-router-dom";
 import { IoMdArrowBack } from "react-icons/io";
+import { Navigate } from "react-router";
 
 function SignUp() {
     const theme = localStorage.getItem("theme")
@@ -28,11 +29,13 @@ function SignUp() {
 
     if (useAuth.loading) return <Loading />
 
+    if (useAuth.user) return <Navigate to={`/dashboard/user/${useAuth.user._id}`} />
+
     return (
         <div className='max-h-screen'>
             <div>
                 <span className='flex px-2 py-2'><IoMdArrowBack onClick={() => window.history.back()} size={25} /></span>
-                <hr />
+                <hr className='border border-black dark:border-gray-300' />
             </div>
             <div className="flex sm:h-screen flex-1 flex-col justify-center items-center px-6 sm:py-12 lg:px-8">
                 <div className="sm:mx-auto sm:w-full sm:max-w-sm">
