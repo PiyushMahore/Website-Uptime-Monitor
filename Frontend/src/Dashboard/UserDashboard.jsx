@@ -10,7 +10,6 @@ import { MdRefresh } from "react-icons/md";
 import { NavLink } from 'react-router-dom';
 import { useUserContext } from '../Context/UserContextProvider.jsx';
 import Loading from '../components/Loading.jsx';
-import { CiMenuKebab } from "react-icons/ci";
 
 function UserDashboard() {
     const useAuth = useUserContext()
@@ -31,32 +30,28 @@ function UserDashboard() {
             .then((data) => setUser(data.data))
     }, [])
 
-    let greetingsAndQuestions = []
-
-    if (user?.fullName) {
-        greetingsAndQuestions = [
-            `Hello, ${user?.fullName.split(" ")[0]}! How's your day going?`,
-            `Hi ${user?.fullName.split(" ")[0]}, what's new with you today?`,
-            `Good to see you, ${user?.fullName.split(" ")[0]}! Any exciting plans?`,
-            `Hey ${user?.fullName.split(" ")[0]}! How have you been?`,
-            `Hi ${user?.fullName.split(" ")[0]}, hope everything is going well!`,
-            `Good morning, ${user?.fullName.split(" ")[0]}! How did you sleep?`,
-            `Hello ${user?.fullName.split(" ")[0]}! Ready to tackle the day?`,
-            `Hey ${user?.fullName.split(" ")[0]}, what are you working on today?`,
-            `Hi ${user?.fullName.split(" ")[0]}, how's everything on your side?`,
-            `What's up, ${user?.fullName.split(" ")[0]}? How's your week been?`,
-            `Good afternoon, ${user?.fullName.split(" ")[0]}! What’s on your agenda?`,
-            `Evening, ${user?.fullName.split(" ")[0]}! How was your day?`,
-            `Hi ${user?.fullName.split(" ")[0]}, any new updates you'd like to share?`,
-            `Hey ${user?.fullName.split(" ")[0]}! Long time no see, how have you been?`,
-            `Hello ${user?.fullName.split(" ")[0]}! Have you done anything fun recently?`,
-            `Good evening, ${user?.fullName.split(" ")[0]}! How's everything going?`,
-            `Hi ${user?.fullName.split(" ")[0]}, did anything interesting happen today?`,
-            `Hey ${user?.fullName.split(" ")[0]}! Got any fun plans for the weekend?`,
-            `Good day, ${user?.fullName.split(" ")[0]}! How are you feeling today?`,
-            `Hello ${user?.fullName.split(" ")[0]}, what’s been on your mind lately?`
-        ];
-    }
+    let greetingsAndQuestions = [
+        `Hello, ${user?.fullName.split(" ")[0]}! How's your day going?`,
+        `Hi ${user?.fullName.split(" ")[0]}, what's new with you today?`,
+        `Good to see you, ${user?.fullName.split(" ")[0]}! Any exciting plans?`,
+        `Hey ${user?.fullName.split(" ")[0]}! How have you been?`,
+        `Hi ${user?.fullName.split(" ")[0]}, hope everything is going well!`,
+        `Good morning, ${user?.fullName.split(" ")[0]}! How did you sleep?`,
+        `Hello ${user?.fullName.split(" ")[0]}! Ready to tackle the day?`,
+        `Hey ${user?.fullName.split(" ")[0]}, what are you working on today?`,
+        `Hi ${user?.fullName.split(" ")[0]}, how's everything on your side?`,
+        `What's up, ${user?.fullName.split(" ")[0]}? How's your week been?`,
+        `Good afternoon, ${user?.fullName.split(" ")[0]}! What’s on your agenda?`,
+        `Evening, ${user?.fullName.split(" ")[0]}! How was your day?`,
+        `Hi ${user?.fullName.split(" ")[0]}, any new updates you'd like to share?`,
+        `Hey ${user?.fullName.split(" ")[0]}! Long time no see, how have you been?`,
+        `Hello ${user?.fullName.split(" ")[0]}! Have you done anything fun recently?`,
+        `Good evening, ${user?.fullName.split(" ")[0]}! How's everything going?`,
+        `Hi ${user?.fullName.split(" ")[0]}, did anything interesting happen today?`,
+        `Hey ${user?.fullName.split(" ")[0]}! Got any fun plans for the weekend?`,
+        `Good day, ${user?.fullName.split(" ")[0]}! How are you feeling today?`,
+        `Hello ${user?.fullName.split(" ")[0]}, what’s been on your mind lately?`
+    ];
 
     useEffect(() => {
         if (searchInput.trim() === "") {
@@ -84,7 +79,7 @@ function UserDashboard() {
                 </div>
             </div>
 
-            {addUrlForm ? <AddUrlForm toggleForm={setAddUrlForm} /> : ""}
+            {addUrlForm ? <AddUrlForm toggleForm={setAddUrlForm} setInput={setSearchInput} /> : ""}
 
             <div className={`mt-12 ${addUrlForm ? "blur-sm" : ""} duration-300 overflow-hidden`}>
                 <div className={`border border-gray-500 rounded-lg ${webDisplay ? "max-h-[1000px]" : "max-h-[43px] border-0"} transition-all duration-500 ease-in-out`}>
@@ -129,7 +124,7 @@ function UserDashboard() {
                             ))
                         }
 
-                        {deleteForm ? <DeleteUrlMenu deleteForm={setDeleteForm} url={datetingUrl} /> : ""}
+                        {deleteForm ? <DeleteUrlMenu setDeleteForm={setDeleteForm} url={datetingUrl} /> : ""}
 
                     </div>
                 </div>

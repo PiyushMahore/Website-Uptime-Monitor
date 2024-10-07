@@ -120,7 +120,7 @@ function UrlDashboard() {
                         url.data && <BollingerChart initialData={url.data?.statusCodes} initialLabels={url.data?.statusCodes} />
                     }
                 </div>
-                {deleteForm ? <DeleteUrlMenu cancel={setDeleteForm} url={url.data?._id} getBack={true} /> : ""}
+                {deleteForm ? <DeleteUrlMenu setDeleteForm={setDeleteForm} url={url.data?._id} getBack={true} /> : ""}
             </div>
         </div >
     )

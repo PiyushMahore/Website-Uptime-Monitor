@@ -23,10 +23,10 @@ export const DashboardContextProvider = (props) => {
 
     const getAllUrls = async () => {
         try {
-            const urls = await axios.get("http://localhost:3000/api/v1/webUrls/get-website-url", {
+            await axios.get("http://localhost:3000/api/v1/webUrls/get-website-url", {
                 withCredentials: true, // This ensures cookies are sent with the request
             })
-            setAllUrls(urls.data.data)
+                .then((data) => setAllUrls(data.data.data))
 
         } catch (error) {
             console.log("somthing went wrong while getting urls", error)
@@ -35,7 +35,7 @@ export const DashboardContextProvider = (props) => {
 
     useEffect(() => {
         getAllUrls()
-    }, [])
+    }, [allUrls])
 
     const deleteUrl = async (urlId) => {
         try {

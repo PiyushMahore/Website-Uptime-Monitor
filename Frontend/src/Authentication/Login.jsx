@@ -16,7 +16,6 @@ function Login() {
 
     const logIn = async () => {
         const data = await useAuth.login(email, password)
-        console.log(data);
         if (data.data._id) {
             navigate(`/dashboard/user/${data.data._id}`)
         } else if (data === "Password is Wrong" || data.data === "Password is Wrong") {
