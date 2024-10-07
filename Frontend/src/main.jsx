@@ -13,6 +13,7 @@ import { DashboardContextProvider } from './Context/DashboardContextProvider.jsx
 import UrlDashboard from '../src/Dashboard/UrlDashboard.jsx'
 import Verify from './Authentication/Verify.jsx';
 import CreateNewPassword from './Authentication/CreateNewPassword.jsx';
+import Profile from './pages/Profile.jsx';
 
 const theme = localStorage.getItem('theme')
 document.body.classList.add(theme)
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
   {
     path: '/dashboard/user/:id',
     element: <UserDashboard />
+  },
+  {
+    path: '/dashboard/profile/:userId',
+    element: <Profile />
   },
   {
     path: '/dashboard/:id/url/:urlId',

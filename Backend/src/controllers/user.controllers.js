@@ -134,10 +134,10 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 })
 
 const updateUserDetails = asyncHandler(async (req, res) => {
-    const { password, newPassword, fullName } = req.body
+    const { password, newPassword, fullName, mobileNumber, userName, email } = req.body
     const profilePicture = req.file?.path
 
-    if (!newPassword && !fullName && !profilePicture) {
+    if (newPassword?.trim() === "" && fullName?.trim() === "" && profilePicture?.trim() === "" && userName?.trim() === "" && mobileNumber?.trim() === "") {
         return res.status(200).json(new apiResponse(200, {}, "nothing to update"))
     }
 
@@ -148,10 +148,12 @@ const updateUserDetails = asyncHandler(async (req, res) => {
         if (passwordCheck === false) {
             throw new apiError(401, "password is wrong")
         }
-        user.password = newPassword || user.password
+        user.password = newPassword
     }
 
-    user.fullName = fullName || user.fullName
+    if (fullName !== "") {
+        user.fullName = fullName
+    }
 
     let proPicture = null;
 
@@ -166,7 +168,37 @@ const updateUserDetails = asyncHandler(async (req, res) => {
 
     user.profilePicture = proPicture || user.profilePicture
 
-    await user.save({ validateBeforeSave: false });
+    if (userName !== "") {
+        if (user.userName !== userName) {
+            const isAlreadyExist = await User.findOne({ userName: userName })
+            if (isAlreadyExist) {
+                throw new apiError(401, "user name already taken")
+            }
+            user.userName = userName
+        }
+    }
+
+    if (mobileNumber !== "") {
+        if (user.mobileNumber !== mobileNumber) {
+            const isAlreadyExist = await User.findOne({ mobileNumber: mobileNumber })
+            if (isAlreadyExist) {
+                throw new apiError(401, "mobile number is already taken")
+            }
+            user.mobileNumber = mobileNumber
+        }
+    }
+
+    if (email !== "") {
+        if (user.email !== email) {
+            const isAlreadyExist = await User.findOne({ email: email })
+            if (isAlreadyExist) {
+                throw new apiError(401, "this email is already taken")
+            }
+            user.email = email
+        }
+    }
+
+    await user.save();
 
     return res
         .status(200)

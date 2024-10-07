@@ -124,8 +124,41 @@ export const UserContextProvider = (props) => {
         }
     }
 
+    async function updateUser(userName, password, newPassword, email, mobileNumber, fullName) {
+        try {
+            const response = await axios.patch(`http://localhost:3000/api/v1/user/update-user`,
+                {
+                    userName: userName || "",
+                    password: password || "",
+                    newPassword: newPassword || "",
+                    email: email || "",
+                    mobileNumber: mobileNumber || "",
+                    fullName: fullName || ""
+                },
+                {
+                    withCredentials: true // This should be in the config, not in the data
+                });
+            return response;
+
+        } catch (error) {
+            return 'unable to update user'
+        }
+    }
+
+    async function logOut() {
+        try {
+            const response = await axios.post(`http://localhost:3000/api/v1/user/logout`, {}, {
+                withCredentials: true
+            })
+            return response;
+
+        } catch (error) {
+            return 'unable to logout'
+        }
+    }
+
     return (
-        <userContext.Provider value={{ loading, setLoading, login, signUp, getCurrentUser, generateOtp, resetPassword }}>
+        <userContext.Provider value={{ loading, setLoading, login, signUp, getCurrentUser, generateOtp, resetPassword, updateUser, logOut }}>
             {props.children}
         </userContext.Provider>
     )
