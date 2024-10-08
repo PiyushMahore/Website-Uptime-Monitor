@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import BollingerChart from '../components/UrlStatusGraphChart.jsx'
 import { useDashboardContext } from '../Context/DashboardContextProvider.jsx'
 import { useParams } from 'react-router'
 import Loading from '../components/Loading.jsx'
 import { AiOutlineSend } from "react-icons/ai";
 import DeleteUrlMenu from '../components/DeleteUrlMenu.jsx'
 import { IoMdArrowBack } from 'react-icons/io'
+import TimingChart from '../components/UrlStatusGraphChart.jsx'
 
 function UrlDashboard() {
     const { urlId } = useParams()
@@ -117,7 +117,7 @@ function UrlDashboard() {
                         Response Time
                     </div>
                     {
-                        url.data && <BollingerChart initialData={url.data?.statusCodes} initialLabels={url.data?.statusCodes} />
+                        url.data && <TimingChart data={url.data?.statusCodes} />
                     }
                 </div>
                 {deleteForm ? <DeleteUrlMenu setDeleteForm={setDeleteForm} url={url.data?._id} getBack={true} /> : ""}

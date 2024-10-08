@@ -1,4 +1,4 @@
-import { fetchUrl } from "./urlFetcher.js";
+import { fetchUrls } from "./urlFetcher.js";
 import { alertSender } from "./alertSender.js";
 import { WebUrl } from "../models/webUrl.model.js";
 import { apiError } from "./apiError.js";
@@ -15,25 +15,25 @@ const checkUrls = async (urlDesc) => {
         throw new apiError(404, "given url is not valid")
     }
 
-    const urlCheck = await fetchUrl(urlDesc);
+    const urlCheck = await fetchUrls(urlDesc);
 
     if (isExist.statusCodes.length >= 60) {
         isExist.statusCodes.splice(0, 10);
     }
 
-    isExist.statusCodes.push(urlCheck.status);
+    isExist.statusCodes.push(urlCheck);
 
-    await isExist.save({ validateBeforeSave: false });
+    await isExist.save({ validateBeforeSave: true });
 
-    if (urlCheck.status >= 500) {
+    if (urlCheck.statusCode >= 500) {
         const alertSend = await alertSender(urlDesc)
         if (!alertSend?.messageId) {
             throw new apiError(500, "failed to send notification")
         }
-        return new apiResponse(200, { urlstatus: urlCheck.status }, `your webisite is not working with status code ${urlCheck.status} we have alerted to the owner of website`)
+        return new apiResponse(200, { urlstatus: urlCheck }, `your webisite is not working with status code ${urlCheck.statusCode} we have alerted to the owner of website`)
     }
 
-    return new apiResponse(200, { urlstatus: urlCheck.status }, `your webisite is perfectly working with status code ${urlCheck.status}`)
+    return new apiResponse(200, { urlstatus: urlCheck }, `your webisite is perfectly working with status code ${urlCheck.statusCode}`)
 }
 
 export { checkUrls }

@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 import axios from "axios";
 import { User } from "../models/user.model.js";
 import mailAlert from "../utils/emailAlert.js"
+import { fetchUrls } from "../utils/urlFetcher.js";
 
 const addWebUrl = asyncHandler(async (req, res) => {
   const { url, notificationType } = req.body;
@@ -25,7 +26,7 @@ const addWebUrl = asyncHandler(async (req, res) => {
 
   const response = await axios.get(url)
 
-  const webUrl = await WebUrl.create({ Urls: url, notificationType: notificationType, userId: req.user?._id, statusCode: response.status, statusCodes: response.status });
+  const webUrl = await WebUrl.create({ Urls: url, notificationType: notificationType, userId: req.user?._id, statusCode: response.status });
 
   if (!webUrl) {
     throw new apiError(
@@ -33,6 +34,16 @@ const addWebUrl = asyncHandler(async (req, res) => {
       "invalid crediantials or network connection failed"
     );
   }
+
+  const webPerformance = await fetchUrls(webUrl);
+
+  if (!webPerformance) {
+    throw new apiError(500, "Somthing wrong with this url")
+  }
+
+  webUrl.statusCodes.push(webPerformance);
+
+  await webUrl.save()
 
   return res
     .status(200)
