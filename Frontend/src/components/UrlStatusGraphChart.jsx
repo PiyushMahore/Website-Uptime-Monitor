@@ -66,12 +66,6 @@ const TimingLineChart = ({ data }) => {
                 .attr("stroke-width", 2)
                 .attr("d", lineGenerator(d.values));
         });
-
-        // Add axes
-        svg.append("g")
-            .attr("transform", `translate(0,${height - margin.bottom})`)
-            .call(d3.axisBottom(x));
-
         svg.append("g")
             .attr("transform", `translate(${margin.left},0)`)
             .call(d3.axisLeft(y).ticks(10, "s"));
@@ -128,6 +122,7 @@ const TimingLineChart = ({ data }) => {
         });
 
     }, [data]);
+
 
     return (
         <div className='border-l border-r border-b dark:border-gray-600 border-black'>
