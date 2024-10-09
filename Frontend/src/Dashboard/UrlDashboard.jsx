@@ -87,11 +87,11 @@ function UrlDashboard() {
             </div>
             <div className='dark:bg-[#1F2433] overflow-hidden sm:px-32 p-8 px-4'>
                 <div className='flex items-center gap-4 my-8'>
-                    <div className={`w-4 h-4 ${url.data?.statusCode < 400 ? "bg-green-600" : "bg-red-600"} rounded-full p-2 relative z-20`}></div>
-                    <div className={`w-4 h-4 ${url.data?.statusCode < 400 ? "bg-green-300" : "bg-red-300"} rounded-full p-2 absolute shrink-animation1 z-10`}></div>
+                    <div className={`w-4 h-4 ${url.data?.statusCode < 500 ? "bg-green-600" : "bg-red-600"} rounded-full p-2 relative z-20`}></div>
+                    <div className={`w-4 h-4 ${url.data?.statusCode < 500 ? "bg-green-300" : "bg-red-300"} rounded-full p-2 absolute shrink-animation1 z-10`}></div>
                     <div className='overflow-hidden break-words'>
                         <a href={url.data?.Urls} className='text-3xl font-semibold'>{url.data?.Urls}</a>
-                        <p className='mt-2'><span className={`font-semibold ${url.data?.statusCode < 400 ? "text-green-600" : "text-red-600"}`}>{url.data?.statusCode < 400 ? "Up" : "Down"}  </span>·  Checked every 3 minutes</p>
+                        <p className='mt-2'><span className={`font-semibold ${url.data?.statusCode < 500 ? "text-green-600" : "text-red-600"}`}>{url.data?.statusCode < 500 ? "Up" : "Down"}  </span>·  Checked every 3 minutes</p>
                     </div>
                 </div>
                 <div className='my-8 flex gap-6'>

@@ -6,9 +6,9 @@ const TimingLineChart = ({ data }) => {
 
     useEffect(() => {
         // Define dimensions
-        const width = 800;
+        const width = 1260;
         const height = 500;
-        const margin = { top: 20, right: 30, bottom: 40, left: 50 };
+        const margin = { top: 20, right: 0, bottom: 40, left: 50 };
 
         // Clear previous content
         d3.select(svgRef.current).selectAll("*").remove();

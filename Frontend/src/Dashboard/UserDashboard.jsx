@@ -52,20 +52,21 @@ function UserDashboard() {
     ];
 
     useEffect(() => {
-        if (searchInput.trim() === "") {
-            setFilterdUrls(useDashboard.allUrls)
-        } else {
-            const filteredOne = useDashboard.allUrls.filter((url) => url.Urls.includes(searchInput))
-            setFilterdUrls(filteredOne)
-        }
+        const filteredOne = useDashboard.allUrls.filter((url) => url.Urls.includes(searchInput))
+        setFilterdUrls(filteredOne)
     }, [useDashboard.allUrls, searchInput])
 
-    if (!useAuth.user) return <Loading />
+    useEffect(() => {
+        useAuth.getCurrentUser()
+        useDashboard.getAllUrls()
+    }, [])
+
+    if (!useAuth.user || useAuth.loading) return <Loading />
 
     return (
         <div className='min-h-screen dark:bg-[#222838]'>
             <div className='sm:px-8 p-2 py-2'>
-                <NavLink to={`/dashboard/profile/${useAuth.user._id}`}><CgProfile size={30} /></NavLink>
+                <NavLink to={`/dashboard/profile/${useAuth.user?._id}`}><CgProfile size={30} /></NavLink>
             </div>
             <hr className='border border-black dark:border-gray-300' />
             <div className={`min-h-screen sm:px-[10%] px-4 dark:bg-[#222838] relative`}>
@@ -133,7 +134,7 @@ function UserDashboard() {
                     </div>
                 </div>
             </div>
-        </div >
+        </div>
     )
 }
 

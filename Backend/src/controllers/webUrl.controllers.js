@@ -3,10 +3,10 @@ import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import { WebUrl } from "../models/webUrl.model.js";
 import mongoose from "mongoose";
-import axios from "axios";
 import { User } from "../models/user.model.js";
 import mailAlert from "../utils/emailAlert.js"
 import { fetchUrls } from "../utils/urlFetcher.js";
+import https from 'https';
 
 const addWebUrl = asyncHandler(async (req, res) => {
   const { url, notificationType } = req.body;
@@ -24,9 +24,7 @@ const addWebUrl = asyncHandler(async (req, res) => {
     throw new apiError(401, "Invalid Url");
   }
 
-  const response = await axios.get(url)
-
-  const webUrl = await WebUrl.create({ Urls: url, notificationType: notificationType, userId: req.user?._id, statusCode: response.status });
+  const webUrl = await WebUrl.create({ Urls: url, notificationType: notificationType, userId: req.user?._id });
 
   if (!webUrl) {
     throw new apiError(
@@ -41,9 +39,11 @@ const addWebUrl = asyncHandler(async (req, res) => {
     throw new apiError(500, "Somthing wrong with this url")
   }
 
+  webUrl.statusCode = webPerformance.statusCode
+
   webUrl.statusCodes.push(webPerformance);
 
-  await webUrl.save()
+  await webUrl.save({ validateBeforeSave: false })
 
   return res
     .status(200)
@@ -220,16 +220,75 @@ const fetchUrl = asyncHandler(async (req, res) => {
 
   if (!url) return null
 
-  try {
-    const response = await axios.get(url)
-    if (response.status >= 500) {
-      return res.status(200).json(new apiResponse(200, response.status, `Your Website is currently Down the Status Code is ${response.status}`))
-    }
-    return res.status(200).json(new apiResponse(200, response.status, `Your Website is Perfectly Working With Status Code ${response.status}`))
+  new Promise((resolve, reject) => {
+    const timings = {
+      nameLookupTime: 0,
+      connectionTime: 0,
+      tlsHandshakeTime: 0,
+      dataTransferStart: 0,
+      dataTransferTime: 0
+    };
 
-  } catch (error) {
-    throw new apiError(500, "Unable to fetch url")
-  }
+    timings.start = Date.now();
+
+    const request = https.get(url, (response) => {
+      timings.statusCode = response.statusCode;
+
+      response.on('data', () => {
+        if (!timings.dataTransferStart) {
+          timings.dataTransferStart = Date.now();
+        }
+      });
+
+      response.on('end', async () => {
+        timings.responseEnd = Date.now();
+        timings.dataTransferTime = timings.dataTransferStart
+          ? timings.responseEnd - timings.dataTransferStart
+          : 0;
+
+        timings.totalTime = timings.nameLookupTime + timings.connectionTime + timings.tlsHandshakeTime + timings.dataTransferTime;
+
+        const finalTimings = {
+          nameLookupTime: timings.nameLookupTime,
+          connectionTime: timings.connectionTime,
+          tlsHandshakeTime: timings.tlsHandshakeTime,
+          dataTransferTime: timings.dataTransferTime,
+          totalTime: timings.totalTime,
+          statusCode: timings.statusCode
+        };
+
+        resolve(finalTimings);
+      });
+    });
+
+    request.on('socket', (socket) => {
+      socket.on('lookup', () => {
+        timings.nameLookupTime = Date.now() - timings.start;
+      });
+
+      socket.on('connect', () => {
+        timings.connectionTime = Date.now() - timings.nameLookupTime - timings.start;
+      });
+
+      socket.on('secureConnect', () => {
+        timings.tlsHandshakeTime = Date.now() - timings.connectionTime - timings.nameLookupTime - timings.start;
+      });
+    });
+
+    request.on('error', (error) => {
+      reject(new apiError(500, "Failed to fetch the URL"));
+    });
+  })
+    .then((response) => {
+      if (response.statusCode >= 500) {
+        return res.status(200).json(new apiResponse(response.statusCode, response.statusCode, `Your Website is currently Down the Status Code is ${response.statusCode}`))
+      }
+      return res.status(200).json(new apiResponse(response.statusCode, response.statusCode, `Your Website is Perfectly Working With Status Code ${response.statusCode}`))
+    })
+
+    .catch(() => {
+      return res.status(200).json(new apiResponse(200, {}, "Url is invalid or no longer available"))
+    })
 })
 
 export { addWebUrl, deleteUrl, editUrl, getAllUrls, getOneUrl, sendAlert, fetchUrl };

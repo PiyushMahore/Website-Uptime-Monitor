@@ -3,11 +3,10 @@ import Navbar from '../components/Navbar'
 import TextTransition, { presets } from 'react-text-transition';
 import "../App.css"
 import { useDashboardContext } from '../Context/DashboardContextProvider';
-import axios from 'axios';
 
 function Home() {
     const useDashboard = useDashboardContext()
-    const msgRef = useRef(null)
+    const [msg, setMsg] = useState("")
 
     const [url, setUrl] = useState("")
     const [isWorking, setISWorking] = useState()
@@ -16,8 +15,11 @@ function Home() {
 
     const fetchUrl = async () => {
         const response = await useDashboard.checkUrl(url)
-        msgRef.current.textContent = response.message
+        setMsg(response.message)
         setISWorking(response.data < 500)
+        setTimeout(() => {
+            setMsg("")
+        }, 8000);
     }
 
     useEffect(() => {
@@ -53,7 +55,7 @@ function Home() {
                     <input value={url} onChange={(e) => setUrl(e.target.value)} className='rounded-xl text-black sm:w-[500px] sm:focus:w-[498px] border border-black focus:outline-none dark:bg-[#f4f7fa] bg-transparent h-[43px] p-2' type="text" placeholder='example:https://example.com' />
                     <button onClick={fetchUrl} className=' border hover:scale-110 hover:border-none duration-200 dark:border-[#f4f7fa] border-gray-700 px-5 py-[10px] sm:px-10 sm:py-[10px] rounded-2xl'>Get Your Result</button>
                 </div>
-                <p ref={msgRef} className={`${isWorking ? "text-green-600" : "text-red-600"} text-xl`}></p>
+                <p className={`${isWorking ? "text-green-600" : "text-red-600"} text-xl`}>{msg}</p>
             </div>
         </div>
     )

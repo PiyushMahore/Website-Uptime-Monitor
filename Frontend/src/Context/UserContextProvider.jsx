@@ -71,10 +71,10 @@ export const UserContextProvider = (props) => {
         try {
             const response = await axios.get('http://localhost:3000/api/v1/user/current-user', {
                 withCredentials: true, // This ensures cookies are sent with the request
-            });
-            setTimeout(() => {
-                setLoading(false)
-            }, 500);
+            })
+                .then((user) => setUser(user.data.data))
+                .then(() => setLoading(false))
+
             return response.data;
         } catch (error) {
             setTimeout(() => {
@@ -168,7 +168,6 @@ export const UserContextProvider = (props) => {
 
     useEffect(() => {
         getCurrentUser()
-            .then((user) => setUser(user.data))
     }, [])
 
     return (

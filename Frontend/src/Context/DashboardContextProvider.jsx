@@ -33,10 +33,6 @@ export const DashboardContextProvider = (props) => {
         }
     }
 
-    useEffect(() => {
-        getAllUrls()
-    }, [allUrls])
-
     const deleteUrl = async (urlId) => {
         try {
             const response = await axios.delete(`http://localhost:3000/api/v1/webUrls/remove-website-url`, {
@@ -79,6 +75,7 @@ export const DashboardContextProvider = (props) => {
             const response = await axios.post('http://localhost:3000/api/v1/webUrls/check-url', {
                 "url": url
             })
+            console.log(response)
             return response.data
 
         } catch (error) {
