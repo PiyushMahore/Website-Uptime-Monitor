@@ -80,12 +80,12 @@ function UrlDashboard() {
     if (!url.data) return <Loading />
 
     return (
-        <div className='dark:bg-[#1F2433]'>
+        <div className='dark:bg-[#1F2433] h-screen'>
             <div>
                 <span className='flex px-2 py-2'><IoMdArrowBack onClick={() => window.history.back()} size={25} /></span>
                 <hr className='border border-black dark:border-gray-300' />
             </div>
-            <div className='dark:bg-[#1F2433] overflow-hidden sm:px-32 p-8 px-4'>
+            <div className='dark:bg-[#1F2433] h-fit overflow-hidden sm:px-32 p-8 px-4'>
                 <div className='flex items-center gap-4 my-8'>
                     <div className={`w-4 h-4 ${url.data?.statusCode < 500 ? "bg-green-600" : "bg-red-600"} rounded-full p-2 relative z-20`}></div>
                     <div className={`w-4 h-4 ${url.data?.statusCode < 500 ? "bg-green-300" : "bg-red-300"} rounded-full p-2 absolute shrink-animation1 z-10`}></div>
@@ -104,7 +104,7 @@ function UrlDashboard() {
                         <p className='text-xl font-semibold'>{day} days {hours} hours {minutes} mins</p>
                     </div>
                     <div className='border border-gray-600 px-4 py-4 rounded-md sm:w-72 w-full'>
-                        <p>Last checked at</p>
+                        <p>Next checke at</p>
                         <p className='text-xl font-semibold'>{lastUpdatedAt} ago</p>
                     </div>
                     <div className='border border-gray-600 px-4 py-4 rounded-md sm:w-72 w-full'>
@@ -122,7 +122,7 @@ function UrlDashboard() {
                 </div>
                 {deleteForm ? <DeleteUrlMenu setDeleteForm={setDeleteForm} url={url.data?._id} getBack={true} /> : ""}
             </div>
-        </div >
+        </div>
     )
 }
 

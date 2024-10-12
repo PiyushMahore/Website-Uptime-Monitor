@@ -5,53 +5,46 @@ const TimingLineChart = ({ data }) => {
     const svgRef = useRef();
 
     useEffect(() => {
-        // Define dimensions
         const width = 1260;
         const height = 500;
-        const margin = { top: 20, right: 0, bottom: 40, left: 50 };
+        const margin = { top: 40, right: 35, bottom: 70, left: 80 };
 
         // Clear previous content
         d3.select(svgRef.current).selectAll("*").remove();
 
         // Create the SVG container
         const svg = d3.select(svgRef.current)
-            .attr("width", width)
-            .attr("height", height)
             .attr("viewBox", `0 0 ${width} ${height}`)
-            .attr("style", "max-width: 100%; height: auto;");
+            .attr("preserveAspectRatio", "xMidYMid meet")
+            .attr("style", "width: 100%; height: auto;");
 
-        // Set up the scales
         const x = d3.scaleBand()
-            .domain(data.map((_, i) => `Request ${i + 1}`)) // Each request is labeled
+            .domain(data.map((_, i) => `Request ${i + 1}`))
             .range([margin.left, width - margin.right]);
 
         const y = d3.scaleLinear()
             .domain([0, d3.max(data, d => d3.max([d.nameLookupTime, d.connectionTime, d.tlsHandshakeTime, d.dataTransferTime, d.totalTime]))]).nice()
             .range([height - margin.bottom, margin.top]);
 
-        // Area generator function
         const areaGenerator = d3.area()
             .x((d, i) => x(`Request ${i + 1}`) + x.bandwidth() / 2)
             .y0(y(0))
             .y1((d) => y(d.value));
 
-        // Line generator function
         const lineGenerator = d3.line()
             .x((d, i) => x(`Request ${i + 1}`) + x.bandwidth() / 2)
             .y((d) => y(d.value));
 
-        // Color scale for lines and areas
         const color = d3.scaleOrdinal(d3.schemeCategory10)
             .domain(["nameLookupTime", "connectionTime", "tlsHandshakeTime", "dataTransferTime", "totalTime"]);
 
-        // Prepare data for each metric
         const metrics = ["nameLookupTime", "connectionTime", "tlsHandshakeTime", "dataTransferTime", "totalTime"];
+        const metricLabels = ["Name lookup", "Connection", "TLS handshake", "Data transfer", "Total time"];
         const lineData = metrics.map(metric => ({
             metric,
             values: data.map((d, i) => ({ index: `Request ${i + 1}`, value: d[metric] }))
         }));
 
-        // Create the areas and lines
         lineData.forEach(d => {
             svg.append("path")
                 .datum(d.values)
@@ -66,69 +59,99 @@ const TimingLineChart = ({ data }) => {
                 .attr("stroke-width", 2)
                 .attr("d", lineGenerator(d.values));
         });
+
         svg.append("g")
             .attr("transform", `translate(${margin.left},0)`)
-            .call(d3.axisLeft(y).ticks(10, "s"));
+            .call(d3.axisLeft(y).ticks(10, "s").tickFormat(d => `${d} ms`))
+            .style("font-size", "14px");
 
-        // Tooltip
-        const tooltip = d3.select("body").append("div")
-            .attr("class", "tooltip")
-            .style("opacity", 0)
-            .style("position", "absolute")
-            .style("background-color", "white")
-            .style("border", "1px solid #ddd")
-            .style("padding", "10px")
-            .style("font-size", "12px");
-
-        // Tooltip interaction
-        svg.selectAll("path")
-            .on("mousemove", function (event, d) {
-                const [x, y] = d3.pointer(event);
-                const index = Math.floor((x - margin.left) / x.bandwidth()); // Approximate index
-
-                if (index >= 0 && index < data.length) {
-                    tooltip.transition().duration(200).style("opacity", 1);
-                    tooltip.html(`
-                        <strong>Request ${index + 1}</strong><br>
-                        Name Lookup: ${data[index].nameLookupTime}ms<br>
-                        Connection: ${data[index].connectionTime}ms<br>
-                        TLS Handshake: ${data[index].tlsHandshakeTime}ms<br>
-                        Data Transfer: ${data[index].dataTransferTime}ms<br>
-                        Total Time: ${data[index].totalTime}ms
-                    `)
-                        .style("left", `${event.pageX + 15}px`)
-                        .style("top", `${event.pageY - 28}px`);
-                }
-            })
-            .on("mouseout", () => tooltip.transition().duration(500).style("opacity", 0));
-
-        // Add legend
         const legend = svg.append("g")
-            .attr("transform", `translate(${width - margin.right - 120},${margin.top})`);
+            .attr("transform", `translate(${margin.left},${height - margin.bottom + 30})`);
 
-        metrics.forEach((metric, i) => {
+        const legendItemSpacing = 150;
+
+        metricLabels.forEach((label, i) => {
             legend.append("rect")
-                .attr("x", 0)
-                .attr("y", i * 20)
-                .attr("width", 15)
-                .attr("height", 15)
-                .attr("fill", color(metric));
+                .attr("x", i * legendItemSpacing)
+                .attr("y", 0)
+                .attr("width", 10)
+                .attr("height", 10)
+                .attr("fill", color(metrics[i]));
 
             legend.append("text")
-                .attr("x", 20)
-                .attr("y", i * 20 + 12)
-                .text(metric)
-                .style("font-size", "12px");
+                .attr("x", i * legendItemSpacing + 15)
+                .attr("y", 10)
+                .text(label)
+                .style("font-size", "16px");
         });
 
-    }, [data]);
+        // Create hover box only once
+        let hoverBox = d3.select(".hover-box");
+        if (hoverBox.empty()) {
+            hoverBox = d3.select("body").append("div")
+                .attr("class", "hover-box")
+                .style("opacity", 0)
+                .style("position", "absolute")
+                .style("background-color", "white")
+                .style("border", "1px solid #ddd")
+                .style("padding", "10px")
+                .style("font-size", "12px");
+        }
 
+        // Create the vertical hover line with white color and wider stroke
+        let hoverLine = svg.append("line")
+            .attr("class", "hover-line")
+            .style("stroke", "white")  // Set the line color to white
+            .style("stroke-width", "2px")  // Make the line a bit wider
+            .style("opacity", 0); // Initially hidden
+
+        // Function to show hover line
+        const showHoverLine = (index) => {
+            hoverLine.attr("x1", x(`Request ${index + 1}`) + x.bandwidth() / 2)
+                .attr("x2", x(`Request ${index + 1}`) + x.bandwidth() / 2)
+                .attr("y1", margin.top)
+                .attr("y2", height - margin.bottom)
+                .style("opacity", 1);  // Always visible
+        };
+
+        // Set up event listeners on the SVG container to manage hover interactions
+        svg.on("mousemove", function (event) {
+            const [xPos] = d3.pointer(event, this);
+            const index = Math.floor((xPos - margin.left) / x.bandwidth());
+
+            if (index >= 0 && index < data.length) {
+                const hoveredData = data[index];
+
+                // Show hover box
+                hoverBox.transition().duration(0).style("opacity", 1);
+                hoverBox.html(`
+                    <strong>Request ${index + 1}</strong><br>
+                    Name Lookup: ${hoveredData.nameLookupTime} ms<br>
+                    Connection: ${hoveredData.connectionTime} ms<br>
+                    TLS Handshake: ${hoveredData.tlsHandshakeTime} ms<br>
+                    Data Transfer: ${hoveredData.dataTransferTime} ms<br>
+                    Total Time: ${hoveredData.totalTime} ms
+                `)
+                    .style("left", `${event.pageX + 15}px`)
+                    .style("top", `${event.pageY - 28}px`);
+
+                // Show hover line and keep it visible
+                showHoverLine(index);
+            }
+        })
+            .on("mouseleave", function () {
+                // Hide both hover box and hover line when mouse leaves the chart area
+                hoverBox.transition().duration(0).style("opacity", 0);
+                hoverLine.style("opacity", 0);
+            });
+
+    }, [data]);
 
     return (
         <div className='border-l border-r border-b dark:border-gray-600 border-black'>
             <svg ref={svgRef}></svg>
         </div>
-    )
+    );
 };
 
 export default TimingLineChart;
