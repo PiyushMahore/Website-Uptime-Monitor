@@ -105,7 +105,7 @@ function UrlDashboard() {
                     </div>
                     <div className='border border-gray-600 px-4 py-4 rounded-md sm:w-72 w-full'>
                         <p>Next checke at</p>
-                        <p className='text-xl font-semibold'>{lastUpdatedAt} ago</p>
+                        <p className='text-xl font-semibold'>{lastUpdatedAt} </p>
                     </div>
                     <div className='border border-gray-600 px-4 py-4 rounded-md sm:w-72 w-full'>
                         <p>Incidents</p>

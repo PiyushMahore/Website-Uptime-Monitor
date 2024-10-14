@@ -11,7 +11,6 @@ export const UserContextProvider = (props) => {
         try {
             setLoading(true);
 
-            // Create a FormData object
             const formData = new FormData();
             formData.append('fullName', fullName);
             formData.append('userName', userName);
@@ -20,12 +19,11 @@ export const UserContextProvider = (props) => {
             formData.append('mobileNumber', mobileNumber);
             formData.append('coverImage', coverImage);
 
-            // Send the POST request with FormData
             const response = await axios.post('http://localhost:3000/api/v1/user/signup', formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data' // This is actually not necessary, Axios sets this automatically for FormData
+                    'Content-Type': 'multipart/form-data'
                 },
-                withCredentials: true, // Ensure cookies are sent with the request
+                withCredentials: true,
             });
 
             setTimeout(() => {
@@ -38,8 +36,7 @@ export const UserContextProvider = (props) => {
                 setLoading(false)
             }, 500);
             console.error('Error in SignUp:', error);
-            // Optionally, handle the error, e.g., by setting an error state
-            throw error; // Re-throwing the error might be useful for further handling
+            throw error;
         }
     };
 
@@ -125,31 +122,30 @@ export const UserContextProvider = (props) => {
         }
     }
 
-    async function updateUser(userName, password, newPassword, email, mobileNumber, fullName) {
-        setLoading(true)
-        try {
-            const response = await axios.patch(`http://localhost:3000/api/v1/user/update-user`,
-                {
-                    userName: userName || "",
-                    password: password || "",
-                    newPassword: newPassword || "",
-                    email: email || "",
-                    mobileNumber: mobileNumber || "",
-                    fullName: fullName || ""
-                },
-                {
-                    withCredentials: true
-                });
-            setTimeout(() => {
-                setLoading(false)
-            }, 500);
-            return response;
+    async function updateUser(userName, password, newPassword, email, mobileNumber, fullName, profilePicture) {
+        const formData = new FormData();
+        formData.append('userName', userName);
+        formData.append('password', password);
+        formData.append('newPassword', newPassword);
+        formData.append('email', email);
+        formData.append('mobileNumber', mobileNumber);
+        formData.append('fullName', fullName);
 
+        if (profilePicture) {
+            formData.append('profilePicture', profilePicture);
+        }
+
+        try {
+            const response = await axios.patch('http://localhost:3000/api/v1/user/update-user', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+                withCredentials: true,
+            });
+
+            console.log('User updated:', response.data);
+            return response.data;
         } catch (error) {
-            setTimeout(() => {
-                setLoading(false)
-            }, 500);
-            return 'unable to update user'
+            console.error('Error updating user:', error);
+            return 'Unable to update user';
         }
     }
 

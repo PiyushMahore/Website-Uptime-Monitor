@@ -58,12 +58,16 @@
 }
 
 .hover-box {
-  background-color: white;
-  border: 1px solid #ddd;
-  padding: 10px;
-  font-size: 12px;
-  pointer-events: none; /* Prevents the hover box from interfering with the chart hover */
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  color: black;
+  opacity: 0;
+  position: absolute;
+  background-color: rgba(40, 44, 52, 0.95); /* Dark semi-transparent background */
+  color: #ffffff; /* White text */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle white border */
+  border-radius: 8px; /* Smooth rounded corners */
+  padding: 12px 16px; /* Better padding for readability */
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.4); /* Stronger shadow for depth */
+  font-size: 14px; /* Slightly larger font */
+  font-family: 'Arial', sans-serif; /* Clean font */
+  pointer-events: none; /* Ensure it doesn't interfere with cursor */
+  transition: opacity 0.2s ease-in-out; /* Smooth fade-in effect */
 }

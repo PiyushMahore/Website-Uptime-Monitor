@@ -9,8 +9,9 @@ function DeleteUrlMenu({ setDeleteForm, url, getBack }) {
             <h1 className='text-2xl'>Delete URL</h1>
             <div className='flex gap-8 mt-4'>
                 <button className='py-2 px-3 dark:bg-[#222838] border border-gray-500 rounded-md' onClick={() => setDeleteForm(false)}>Cancel</button>
-                <button onClick={() => {
-                    useDashboard.deleteUrl(url)
+                <button onClick={async () => {
+                    await useDashboard.deleteUrl(url)
+                    await useDashboard.getAllUrls()
                     setDeleteForm(false)
                     if (getBack) {
                         window.history.back()

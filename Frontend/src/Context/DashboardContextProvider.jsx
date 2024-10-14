@@ -37,7 +37,7 @@ export const DashboardContextProvider = (props) => {
         try {
             const response = await axios.delete(`http://localhost:3000/api/v1/webUrls/remove-website-url`, {
                 data: { urlId },
-                withCredentials: true, // Ensure cookies are sent with the request
+                withCredentials: true,
             });
             return response.data;
 
@@ -75,7 +75,6 @@ export const DashboardContextProvider = (props) => {
             const response = await axios.post('http://localhost:3000/api/v1/webUrls/check-url', {
                 "url": url
             })
-            console.log(response)
             return response.data
 
         } catch (error) {

@@ -155,18 +155,22 @@ const updateUserDetails = asyncHandler(async (req, res) => {
         user.fullName = fullName
     }
 
-    let proPicture = null;
+    if (profilePicture !== "") {
+        let proPicture = null;
 
-    if (req.file?.path) {
-        const picPath = req.file.path;
-        const upload = await uploadToCloudinary(picPath)
-        if (!upload) {
-            throw new apiError(500, "failed to update profile picture")
+        if (req.file?.path) {
+            const picPath = req.file.path;
+            const upload = await uploadToCloudinary(picPath)
+            if (!upload) {
+                throw new apiError(500, "failed to update profile picture")
+            }
+            proPicture = upload.url
         }
-        proPicture = upload.url
+
+        user.profilePicture = proPicture
     }
 
-    user.profilePicture = proPicture || user.profilePicture
+    console.log(profilePicture)
 
     if (userName !== "") {
         if (user.userName !== userName) {

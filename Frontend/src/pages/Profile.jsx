@@ -8,14 +8,14 @@ import LogoutForm from '../components/LogoutForm';
 function Profile() {
     const useAuth = useUserContext()
 
-    console.log(useAuth.user)
-
     const [isEditable, setEditable] = useState(false);
     const [fullName, setFullName] = useState("");
     const [userName, setUserName] = useState("");
     const [mobileNumber, setMobileNumber] = useState("");
     const [email, setEmail] = useState("");
     const [logOutForm, setLogOutForm] = useState(false)
+    const [profilePicture, setProfilePicture] = useState(null); // Store the file here
+    const [previewImage, setPreviewImage] = useState(''); // Store the base64 preview here
 
     useEffect(() => {
         if (useAuth.user) {
@@ -23,13 +23,27 @@ function Profile() {
             setEmail(useAuth.user.email)
             setUserName(useAuth.user.userName)
             setMobileNumber(useAuth.user.mobileNumber)
+            setPreviewImage(useAuth.user.profilePicture)
         }
     }, [useAuth.user])
 
     const updateUser = async () => {
-        await useAuth.updateUser(userName, "", "", email, mobileNumber, fullName)
+        await useAuth.updateUser(userName, "", "", email, mobileNumber, fullName, profilePicture)
         setEditable(!isEditable)
     }
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setProfilePicture(file);
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                setPreviewImage(event.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     if (useAuth.loading || !useAuth.user) return <Loading />
 
@@ -39,7 +53,21 @@ function Profile() {
                 <img src={coverImg} className='w-full h-28 bg-cover bg-center' />
                 <div className='flex sm:items-center items-start justify-between pr-1 sm:pr-6 px-6'>
                     <div className='flex gap-4'>
-                        <img className='h-24 w-24 rounded-full relative -top-6 bg-center bg-cover' src={useAuth.user.profilePicture === "" ? defaultProfilePic : useAuth.user.profilePicture} alt="Profile" />
+                        <img
+                            className="h-24 w-24 rounded-full relative -top-6 bg-center bg-cover cursor-pointer"
+                            src={previewImage || defaultProfilePic}
+                            alt="Profile"
+                            onClick={() => isEditable ? document.getElementById('fileInput').click() : ""} // Trigger input click
+                        />
+
+                        {/* Hidden input for file selection */}
+                        <input
+                            type="file"
+                            id="fileInput"
+                            style={{ display: 'none' }}
+                            accept="image/*"
+                            onChange={handleImageChange} // Handle file selection
+                        />
                         <div className='mt-5 sm:mt-1.5'>
                             <p className='font-bold'>{useAuth.user.fullName}</p>
                             <p>{useAuth.user.email}</p>

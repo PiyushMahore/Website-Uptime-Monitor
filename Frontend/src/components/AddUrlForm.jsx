@@ -22,6 +22,7 @@ function AddUrlForm({ toggleForm, setInput }) {
             throw Error("please slect alert option")
         }
         await useDashboard.addUrl(url, notificationType)
+        await useDashboard.getAllUrls()
         setInput("")
         toggleForm(false)
     }

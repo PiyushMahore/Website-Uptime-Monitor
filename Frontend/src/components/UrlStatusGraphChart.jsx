@@ -2,11 +2,12 @@ import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
 const TimingLineChart = ({ data }) => {
+    const theme = localStorage.getItem('theme')
     const svgRef = useRef();
 
     useEffect(() => {
-        const width = 1260;
-        const height = 500;
+        let width = window.innerWidth > 768 ? 1260 : window.innerWidth + 450; // Reduce width on mobile
+        let height = window.innerWidth > 768 ? 500 : 650; // Increase height on mobile
         const margin = { top: 40, right: 35, bottom: 70, left: 80 };
 
         // Clear previous content
@@ -92,7 +93,8 @@ const TimingLineChart = ({ data }) => {
                 .attr("class", "hover-box")
                 .style("opacity", 0)
                 .style("position", "absolute")
-                .style("background-color", "white")
+                .style("background-color", `${theme === "dark" ? "black" : "white"}`)
+                .style("color", `${theme === "dark" ? "white" : "black"}`)
                 .style("border", "1px solid #ddd")
                 .style("padding", "10px")
                 .style("font-size", "12px");
@@ -122,10 +124,8 @@ const TimingLineChart = ({ data }) => {
             if (index >= 0 && index < data.length) {
                 const hoveredData = data[index];
 
-                // Show hover box
                 hoverBox.transition().duration(0).style("opacity", 1);
                 hoverBox.html(`
-                    <strong>Request ${index + 1}</strong><br>
                     Name Lookup: ${hoveredData.nameLookupTime} ms<br>
                     Connection: ${hoveredData.connectionTime} ms<br>
                     TLS Handshake: ${hoveredData.tlsHandshakeTime} ms<br>
@@ -134,10 +134,8 @@ const TimingLineChart = ({ data }) => {
                 `)
                     .style("left", `${event.pageX + 15}px`)
                     .style("top", `${event.pageY - 28}px`);
-
-                // Show hover line and keep it visible
-                showHoverLine(index);
             }
+            showHoverLine(index);
         })
             .on("mouseleave", function () {
                 // Hide both hover box and hover line when mouse leaves the chart area

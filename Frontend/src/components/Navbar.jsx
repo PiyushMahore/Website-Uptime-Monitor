@@ -28,13 +28,13 @@ function Navbar() {
             {/* WEB */}
             <div className='list-none hidden sm:flex justify-between dark:text-gray-300 text-gray-900'>
                 <ul className='flex gap-8'>
-                    <Link to='home' spy={true} smooth={true} offset={50} duration={500} className='cursor-pointer relative px-3 rounded-md py-0.5 after:content-[""] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] dark:after:bg-white after:bg-gray-800 after:scale-x-0 after:origin-bottom-right after:transition-transform after:duration-250 after:ease-out hover:after:scale-x-100 dark:hover:text-white hover:text-black hover:after:origin-bottom-left'>
+                    <Link to='home' spy={true} smooth={true} offset={50} duration={500} className='cursor-pointer relative px-3 rounded-md py-0.5 after:content-[""] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] dark:after:bg-white after:bg-gray-800 after:scale-x-0 after:origin-bottom-right after:transition-transform after:duration-700 after:ease-out hover:after:scale-x-100 dark:hover:text-white hover:text-black hover:after:origin-bottom-left'>
                         Home
                     </Link>
-                    <Link to='about' spy={true} smooth={true} offset={50} duration={800} className='cursor-pointer relative px-3 rounded-md py-0.5 after:content-[""] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] dark:after:bg-white after:bg-gray-800 after:scale-x-0 after:origin-bottom-right after:transition-transform after:duration-250 after:ease-out hover:after:scale-x-100 dark:hover:text-white hover:text-black hover:after:origin-bottom-left'>
+                    <Link to='about' spy={true} smooth={true} offset={50} duration={800} className='cursor-pointer relative px-3 rounded-md py-0.5 after:content-[""] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] dark:after:bg-white after:bg-gray-800 after:scale-x-0 after:origin-bottom-right after:transition-transform after:duration-700 after:ease-out hover:after:scale-x-100 dark:hover:text-white hover:text-black hover:after:origin-bottom-left'>
                         About Us
                     </Link>
-                    <Link to='contact' spy={true} smooth={true} offset={50} duration={900} className='cursor-pointer relative px-3 rounded-md py-0.5 after:content-[""] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] dark:after:bg-white after:bg-gray-800 after:scale-x-0 after:origin-bottom-right after:transition-transform after:duration-250 after:ease-out hover:after:scale-x-100 dark:hover:text-white hover:text-black hover:after:origin-bottom-left'>
+                    <Link to='contact' spy={true} smooth={true} offset={50} duration={900} className='cursor-pointer relative px-3 rounded-md py-0.5 after:content-[""] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] dark:after:bg-white after:bg-gray-800 after:scale-x-0 after:origin-bottom-right after:transition-transform after:duration-700 after:ease-out hover:after:scale-x-100 dark:hover:text-white hover:text-black hover:after:origin-bottom-left'>
                         Contact Us
                     </Link>
                 </ul>
