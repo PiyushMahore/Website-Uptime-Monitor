@@ -12,16 +12,16 @@ function Footer() {
                     <h1 className='text-2xl font-bold dark:text-white text-gray-950 mb-1'>Uptime Moniter</h1>
                     <p className='text-sm sm:flex hidden'>UpTime Monitor lets you see inside any stack, debug any issue, and resolve any incident.</p>
                 </div>
-                <div className='flex w-full justify-end gap-8 items-end ml-6 text-base'>
+                <div className='flex w-full justify-end gap-8 items-end sm:ml-6 text-base'>
                     <div className='sm:flex hidden gap-4'>
                         <h3>+91 9131 4835 **</h3>
                         <h3>hello@uptimemonitor.com</h3>
                     </div>
                     <div className='flex gap-4 text-xl'>
-                        <FaGithub />
-                        <FaInstagram />
-                        <FaLinkedin />
-                        <FaTwitter />
+                        <a href='https://github.com/PiyushMahore/Website-Uptime-Monitor'><FaGithub /></a>
+                        <a href='#'><FaInstagram /></a>
+                        <a href='https://www.linkedin.com/in/piyush-mahore-51602a2b1/'><FaLinkedin /></a>
+                        <a href='https://x.com/Piyush_Mahore_'><FaTwitter /></a>
                     </div>
                 </div>
             </div>

@@ -14,7 +14,7 @@ function App() {
   if (useAuth.user) return <Navigate to={`/dashboard/user/${useAuth.user._id}`} />
 
   return (
-    <div>
+    <div className='px-2 sm:px-0'>
       <Home />
       <Feature />
       <Alerts />
