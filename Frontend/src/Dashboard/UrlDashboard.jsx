@@ -31,7 +31,9 @@ function UrlDashboard() {
         }
 
         setData();
+    }, [url.data?.createdAt]);
 
+    useEffect(() => {
         const intervalId = setInterval(() => {
             useDashboard.getSingleUrl(urlId)
                 .then((data) => setUrl(data))
@@ -46,7 +48,8 @@ function UrlDashboard() {
         }, 60000);
 
         return () => clearInterval(intervalId);
-    }, [url]);
+    }, [])
+
 
     useEffect(() => {
         if (!url.data?.updatedAt) return;

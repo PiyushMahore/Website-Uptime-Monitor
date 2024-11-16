@@ -24,6 +24,7 @@ function Profile() {
             setUserName(useAuth.user.userName)
             setMobileNumber(useAuth.user.mobileNumber)
             setPreviewImage(useAuth.user.profilePicture)
+            setProfilePicture(useAuth.user.profilePicture)
         }
     }, [useAuth.user])
 

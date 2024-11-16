@@ -130,10 +130,7 @@ export const UserContextProvider = (props) => {
         formData.append('email', email);
         formData.append('mobileNumber', mobileNumber);
         formData.append('fullName', fullName);
-
-        if (profilePicture) {
-            formData.append('profilePicture', profilePicture);
-        }
+        formData.append('profilePicture', profilePicture);
 
         try {
             const response = await axios.patch('http://localhost:3000/api/v1/user/update-user', formData, {

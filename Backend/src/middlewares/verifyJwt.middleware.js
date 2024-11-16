@@ -1,13 +1,13 @@
 import jwt from "jsonwebtoken"
 import { asyncHandler } from "../utils/asyncHandler.js"
-import {apiError} from "../utils/apiError.js"
+import { apiError } from "../utils/apiError.js"
 import { User } from "../models/user.model.js"
 
-const verifyJwt = asyncHandler(async(req, _, next) => {    
+const verifyJwt = asyncHandler(async (req, _, next) => {
     try {
-        const token = req.cookies.refreshToken || req.header("Authorization")?.replace("Bearer ", "")        
+        const token = req.cookies.refreshToken || req.header("Authorization")?.replace("Bearer ", "")
 
-        if(!token) {
+        if (!token) {
             throw new apiError(404, "Unauthorise request")
         }
 
@@ -15,13 +15,13 @@ const verifyJwt = asyncHandler(async(req, _, next) => {
 
         const user = await User.findById(decodedToken?._id).select("-password -refreshToken")
 
-        if(!user) {
+        if (!user) {
             throw new apiError(404, "Invalid token")
         }
 
         req.user = user
         next()
-        
+
     } catch (error) {
         throw new apiError(500, error.message || "Somthing went wrong while finding user")
     }

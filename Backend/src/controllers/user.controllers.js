@@ -155,7 +155,7 @@ const updateUserDetails = asyncHandler(async (req, res) => {
         user.fullName = fullName
     }
 
-    if (profilePicture !== "") {
+    if (profilePicture !== "" || profilePicture !== null) {
         let proPicture = null;
 
         if (req.file?.path) {
@@ -165,12 +165,9 @@ const updateUserDetails = asyncHandler(async (req, res) => {
                 throw new apiError(500, "failed to update profile picture")
             }
             proPicture = upload.url
+            user.profilePicture = proPicture
         }
-
-        user.profilePicture = proPicture
     }
-
-    console.log(profilePicture)
 
     if (userName !== "") {
         if (user.userName !== userName) {
