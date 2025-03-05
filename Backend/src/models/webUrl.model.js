@@ -11,7 +11,7 @@ const webUrlSchema = new Schema(
             required: true
         },
         userId: {
-            type: Schema.Types.ObjectId,
+            type: mongoose.Types.ObjectId,
             ref: "User"
         },
         statusCode: {

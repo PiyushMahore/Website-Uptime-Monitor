@@ -5,6 +5,8 @@ const TimingLineChart = ({ data }) => {
     const theme = localStorage.getItem('theme')
     const svgRef = useRef();
 
+    console.log(theme);
+
     useEffect(() => {
         let width = window.innerWidth > 768 ? 1260 : window.innerWidth + 450; // Reduce width on mobile
         let height = window.innerWidth > 768 ? 500 : 650; // Increase height on mobile
@@ -82,6 +84,7 @@ const TimingLineChart = ({ data }) => {
             legend.append("text")
                 .attr("x", i * legendItemSpacing + 15)
                 .attr("y", 10)
+                .attr("fill", `${theme == "dark" ? "white" : "black"}`)
                 .text(label)
                 .style("font-size", "16px");
         });
@@ -93,8 +96,8 @@ const TimingLineChart = ({ data }) => {
                 .attr("class", "hover-box")
                 .style("opacity", 0)
                 .style("position", "absolute")
-                .style("background-color", `${theme === "dark" ? "black" : "white"}`)
-                .style("color", `${theme === "dark" ? "white" : "black"}`)
+                .style("background-color", `${theme == "dark" ? "black" : "white"}`)
+                .style("color", `${theme == "dark" ? "white" : "black"}`)
                 .style("border", "1px solid #ddd")
                 .style("padding", "10px")
                 .style("font-size", "12px");
@@ -103,7 +106,7 @@ const TimingLineChart = ({ data }) => {
         // Create the vertical hover line with white color and wider stroke
         let hoverLine = svg.append("line")
             .attr("class", "hover-line")
-            .style("stroke", "white")  // Set the line color to white
+            .style("stroke", `${theme == "dark" ? "white" : "gray"}`)  // Set the line color to white
             .style("stroke-width", "2px")  // Make the line a bit wider
             .style("opacity", 0); // Initially hidden
 
@@ -143,7 +146,7 @@ const TimingLineChart = ({ data }) => {
                 hoverLine.style("opacity", 0);
             });
 
-    }, [data]);
+    }, [data, theme]);
 
     return (
         <div className='border-l border-r border-b dark:border-gray-600 border-black'>
