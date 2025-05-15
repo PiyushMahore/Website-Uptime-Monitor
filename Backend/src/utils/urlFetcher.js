@@ -48,6 +48,9 @@ const fetchUrls = async (url) => {
                 try {
                     const urlDescription = await WebUrl.findById(url._id);
                     urlDescription.statusCode = response.statusCode;
+                    if (response.statusCode > 400) {
+                        urlDescription.incidents += 1;
+                    }
                     await urlDescription.save({ validateBeforeSave: false });
                 } catch (err) {
                     console.error("Error updating URL:", err);

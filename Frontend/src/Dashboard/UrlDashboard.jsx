@@ -17,7 +17,6 @@ function UrlDashboard() {
     const [minutes, setMinutes] = useState(0)
     const [hours, setHours] = useState(0)
     const [day, setDay] = useState(0)
-    const [incidents, setIncidents] = useState(0)
 
     useEffect(() => {
         const setData = () => {
@@ -46,9 +45,6 @@ function UrlDashboard() {
             setDay(Math.floor(addedSinceTime / (24 * 60 * 60)));
             setHours(Math.floor((addedSinceTime % (24 * 60 * 60)) / (60 * 60)));
             setMinutes(Math.floor((addedSinceTime % (60 * 60)) / 60));
-            if (url?.data.statusCode >= 400) {
-                setIncidents((prev) => prev + 1)
-            }
         }, 60000);
 
         return () => clearInterval(intervalId);
@@ -116,7 +112,7 @@ function UrlDashboard() {
                     </div>
                     <div className='border border-gray-600 px-4 py-4 rounded-md sm:w-72 w-full'>
                         <p>Incidents</p>
-                        <p className='text-xl font-semibold'>{incidents}</p>
+                        <p className='text-xl font-semibold'>{url.data.incidents ?? 0}</p>
                     </div>
                 </div>
                 <div className='my-8 w-full'>

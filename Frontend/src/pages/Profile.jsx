@@ -72,13 +72,19 @@ function Profile() {
     if (useAuth.loading || !useAuth.user) return <Loading />
 
     return (
-        <div className='h-screen max-w-screen sm:px-10 sm:pt-20 overflow-hidden'>
+        <div className='h-screen w-screen sm:px-10 sm:pt-20 overflow-hidden'>
             <div className='sm:border h-full sm:h-auto rounded-lg border-gray-300 dark:bg-[#1F2433] bg-gray-100'>
-                <img src={coverImg} className='w-full h-28 bg-cover bg-center' />
+                <div className='p-3 flex justify-between items-center'>
+                    <h3>Basic Info</h3>
+                    <div className='text-center hidden sm:flex justify-center'>
+                        <button onClick={() => setLogOutForm(true)} className='bg-red-600 hover:bg-red-500 px-4 py-1.5 rounded hover:scale-105 duration-100'>Log Out</button>
+                    </div>
+                </div>
+                <hr />
                 <div className='flex sm:items-center items-start justify-between pr-1 sm:pr-6 px-6'>
-                    <div className='flex gap-4'>
+                    <div className='flex gap-4 py-6'>
                         <img
-                            className="h-24 w-24 rounded-full relative -top-6 bg-center bg-cover cursor-pointer"
+                            className="h-24 w-24 rounded-full relative bg-center bg-cover cursor-pointer"
                             src={previewImage || defaultProfilePic}
                             alt="Profile"
                             onClick={() => isEditable ? document.getElementById('fileInput').click() : ""} // Trigger input click
@@ -92,7 +98,7 @@ function Profile() {
                             accept="image/*"
                             onChange={handleImageChange} // Handle file selection
                         />
-                        <div className='mt-5 sm:mt-1.5'>
+                        <div className='mt-5 sm:mt-1.5 translate-y-4'>
                             <p className='font-bold'>{useAuth.user.fullName}</p>
                             <p>{useAuth.user.email}</p>
                         </div>
@@ -175,9 +181,6 @@ function Profile() {
                 <div className='text-center mt-6 sm:hidden'>
                     <button onClick={() => setLogOutForm(true)} className='bg-red-600 px-4 py-1.5 rounded hover:scale-105 duration-100'>Log Out</button>
                 </div>
-            </div>
-            <div className='text-center mt-6 hidden sm:flex justify-center'>
-                <button onClick={() => setLogOutForm(true)} className='bg-red-600 hover:bg-red-500 px-4 py-1.5 rounded hover:scale-105 duration-100'>Log Out</button>
             </div>
             {logOutForm ? <LogoutForm setLogoutForm={setLogOutForm} /> : null}
         </div>

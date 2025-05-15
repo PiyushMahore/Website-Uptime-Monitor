@@ -17,6 +17,10 @@ const webUrlSchema = new Schema(
         statusCode: {
             type: Number,
         },
+        incidents: {
+            type: Number,
+            default: 0
+        },
         statusCodes: []
     },
     {
