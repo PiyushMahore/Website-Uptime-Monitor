@@ -36,7 +36,6 @@ export const UserContextProvider = (props) => {
                 setLoading(false)
             }, 500);
             console.error('Error in SignUp:', error);
-            throw error;
         }
     };
 

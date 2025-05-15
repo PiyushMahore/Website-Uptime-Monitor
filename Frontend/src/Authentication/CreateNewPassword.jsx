@@ -15,9 +15,14 @@ function CreateNewPassword() {
     const useAuth = useUserContext()
 
     const changePassword = async () => {
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!passwordRegex.test(password)) {
+            setMessage("Invalid password. Password must be at least 8 characters long, Contain at least one letter & Contain at least one digit, Only use letters, digits, and symbols.");
+            return;
+        }
         if (password !== confirmPassword) {
             setMessage("password & confirm password not match")
-            return null;
+            return;
         }
         const result = await useAuth.resetPassword(email, password)
         if (result.message === "Password changed successfully") {

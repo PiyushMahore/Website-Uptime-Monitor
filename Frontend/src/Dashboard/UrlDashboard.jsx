@@ -21,8 +21,12 @@ function UrlDashboard() {
 
     useEffect(() => {
         const setData = () => {
-            useDashboard.getSingleUrl(urlId)
-                .then((data) => setUrl(data))
+            if (!urlId) return;
+            if (url.length === 0) {
+                useDashboard.getSingleUrl(urlId)
+                    .then((data) => setUrl(data))
+            }
+            if (!url.data) return;
             let addedSinceTime = new Date() - new Date(url.data?.createdAt);
             addedSinceTime = Math.floor(addedSinceTime / 1000);
             setDay(Math.floor(addedSinceTime / (24 * 60 * 60)));
@@ -31,7 +35,7 @@ function UrlDashboard() {
         }
 
         setData();
-    }, [url.data?.createdAt]);
+    }, [urlId, url]);
 
     useEffect(() => {
         const intervalId = setInterval(() => {
@@ -42,7 +46,7 @@ function UrlDashboard() {
             setDay(Math.floor(addedSinceTime / (24 * 60 * 60)));
             setHours(Math.floor((addedSinceTime % (24 * 60 * 60)) / (60 * 60)));
             setMinutes(Math.floor((addedSinceTime % (60 * 60)) / 60));
-            if (url?.data.statusCode >= 500) {
+            if (url?.data.statusCode >= 400) {
                 setIncidents((prev) => prev + 1)
             }
         }, 60000);

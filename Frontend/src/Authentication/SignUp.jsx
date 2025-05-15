@@ -13,6 +13,8 @@ function SignUp() {
     const useAuth = useUserContext()
     const navigate = useNavigate()
 
+    const [message, setMessage] = useState("");
+
     const [fullName, setFullName] = useState("")
     const [userName, setUserName] = useState("")
     const [email, setEmail] = useState("")
@@ -20,11 +22,42 @@ function SignUp() {
     const [mobileNumber, setMobileNumber] = useState("")
     const [coverImage, setCoverImage] = useState(null)
 
-    const signUp = async () => {
+    const signUp = async (e) => {
+        e.preventDefault();
+        if (!email || !password || !userName || !fullName || !mobileNumber) {
+            setMessage("Please fill all fields")
+            return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            setMessage("Please enter a valid email address");
+            return;
+        }
+
+        const mobileRegex = /^[6-9]\d{9}$/;
+        if (!mobileRegex.test(mobileNumber)) {
+            setMessage("Please enter a valid mobile number");
+            return;
+        }
+
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!passwordRegex.test(password)) {
+            setMessage("Invalid password. Password must be at least 8 characters long, Contain at least one letter & Contain at least one digit, Only use letters, digits, and symbols.");
+            return;
+        }
+
+        const userNameRegex = /^[a-zA-Z0-9_]{3,}$/;
+        if (!userNameRegex.test(userName)) {
+            setMessage("User name must be at least 3 characters long and can only contain letters, numbers, and underscores");
+            return;
+        }
+
         const data = await useAuth.signUp(fullName, userName, email, password, mobileNumber, coverImage || "");
         if (data) {
             navigate(`/dashboard/user/${data.data._id}`)
         }
+        setMessage("User already exists");
     };
 
     if (useAuth.loading) return <Loading />
@@ -42,10 +75,13 @@ function SignUp() {
                     <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900 dark:text-white">
                         Sign up to your account
                     </h2>
+                    <p className="mt-2 text-center text-sm text-red-600 dark:text-red-500">
+                        {message}
+                    </p>
                 </div>
 
                 <div className="mt-10 mx-auto w-full max-w-sm">
-                    <form action="#" method="POST" className="space-y-6">
+                    <form onSubmit={signUp} className="space-y-6">
                         <div>
                             <label htmlFor="fullName" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
                                 Full Name
@@ -168,7 +204,6 @@ function SignUp() {
 
                         <div className="pb-3">
                             <button
-                                onClick={signUp}
                                 type="submit"
                                 className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                             >

@@ -34,4 +34,4 @@ checkingUrls()
 
 setInterval(() => {
     checkingUrls()
-}, 180000);
+}, 1000 * 60 * 3) // every 3 minutes;

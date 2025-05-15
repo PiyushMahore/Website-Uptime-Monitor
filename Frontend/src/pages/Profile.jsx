@@ -16,6 +16,7 @@ function Profile() {
     const [logOutForm, setLogOutForm] = useState(false)
     const [profilePicture, setProfilePicture] = useState(null); // Store the file here
     const [previewImage, setPreviewImage] = useState(''); // Store the base64 preview here
+    const [message, setMessage] = useState("");
 
     useEffect(() => {
         if (useAuth.user) {
@@ -29,8 +30,30 @@ function Profile() {
     }, [useAuth.user])
 
     const updateUser = async () => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            setMessage("Please enter a valid email address");
+            return;
+        }
+
+        const mobileRegex = /^[6-9]\d{9}$/;
+        if (!mobileRegex.test(mobileNumber)) {
+            setMessage("Please enter a valid mobile number");
+            return;
+        }
+
+        const userNameRegex = /^[a-zA-Z0-9_]{3,}$/;
+        if (!userNameRegex.test(userName)) {
+            setMessage("User name must be at least 3 characters long and can only contain letters, numbers, and underscores");
+            return;
+        }
+
         await useAuth.updateUser(userName, "", "", email, mobileNumber, fullName, profilePicture)
         setEditable(!isEditable)
+        setMessage("Profile updated successfully");
+        setTimeout(() => {
+            setMessage("")
+        }, 2000);
     }
 
     const handleImageChange = (e) => {
@@ -148,6 +171,7 @@ function Profile() {
                         </div>
                     </div>
                 </div>
+                <p className={`text-center ${message != "Profile updated successfully" ? "text-red-500" : "text-green-500"} pb-4`}>{message}</p>
                 <div className='text-center mt-6 sm:hidden'>
                     <button onClick={() => setLogOutForm(true)} className='bg-red-600 px-4 py-1.5 rounded hover:scale-105 duration-100'>Log Out</button>
                 </div>

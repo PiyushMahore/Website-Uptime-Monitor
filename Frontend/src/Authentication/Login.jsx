@@ -16,12 +16,24 @@ function Login() {
     const [password, setPassword] = useState("")
 
     const logIn = async () => {
+        if (!email || !password) {
+            setMessage("Please fill all fields")
+            return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            setMessage("Please enter a valid email address");
+            return;
+        }
+
         const data = await useAuth.login(email, password)
-        if (data.data._id) {
+
+        if (data?.data?._id) {
             navigate(`/dashboard/user/${data.data._id}`)
-        } else if (data === "Password is Wrong" || data.data === "Password is Wrong") {
+        } else if (data == "Password is Wrong" || data.data === "Password is Wrong") {
             setMessage("Password is Wrong");
-        } else if (data.data === "user not found") {
+        } else if (data?.data === "user not found") {
             setMessage("User Not Found")
         }
     }

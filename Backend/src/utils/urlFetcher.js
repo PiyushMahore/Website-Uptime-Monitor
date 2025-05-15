@@ -13,7 +13,7 @@ const fetchUrls = async (url) => {
             connectionTime: 0,
             tlsHandshakeTime: 0,
             dataTransferStart: 0,
-            dataTransferTime: 0
+            dataTransferTime: 0,
         };
 
         timings.start = Date.now();
@@ -41,7 +41,8 @@ const fetchUrls = async (url) => {
                     tlsHandshakeTime: timings.tlsHandshakeTime,
                     dataTransferTime: timings.dataTransferTime,
                     totalTime: timings.totalTime,
-                    statusCode: timings.statusCode
+                    statusCode: timings.statusCode,
+                    date: new Date(Date.now())
                 };
 
                 try {

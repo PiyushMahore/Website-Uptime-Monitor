@@ -133,8 +133,14 @@ const TimingLineChart = ({ data }) => {
                     Connection: ${hoveredData.connectionTime} ms<br>
                     TLS Handshake: ${hoveredData.tlsHandshakeTime} ms<br>
                     Data Transfer: ${hoveredData.dataTransferTime} ms<br>
-                    Total Time: ${hoveredData.totalTime} ms
-                `)
+                    Total Time: ${hoveredData.totalTime} ms<br>
+                    Date: ${new Date(hoveredData.date).toLocaleDateString()} <br>
+                    Time: ${new Date(hoveredData.date).toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true // 👈 This ensures AM/PM format
+                })} <br>
+                    `)
                     .style("left", `${event.pageX + 15}px`)
                     .style("top", `${event.pageY - 28}px`);
             }

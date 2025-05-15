@@ -17,7 +17,7 @@ const checkUrls = async (urlDesc) => {
 
     const urlCheck = await fetchUrls(urlDesc);
 
-    if (isExist.statusCodes.length >= 60) {
+    if (isExist.statusCodes.length >= 480) {
         isExist.statusCodes.splice(0, 10);
     }
 

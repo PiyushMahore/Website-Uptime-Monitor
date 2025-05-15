@@ -55,7 +55,7 @@ const signUp = asyncHandler(async (req, res) => {
         }
     }
 
-    const user = await User.create({ fullName, mobileNumber: `+91${mobileNumber}`, userName, email, password, profilePicture: uploadProfilePicture?.url || "" })
+    const user = await User.create({ fullName, mobileNumber, userName, email, password, profilePicture: uploadProfilePicture?.url || "" })
 
     if (!user) {
         throw new apiError(500, "unable to signUp")

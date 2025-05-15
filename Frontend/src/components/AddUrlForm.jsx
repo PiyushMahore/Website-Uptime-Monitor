@@ -7,6 +7,7 @@ function AddUrlForm({ toggleForm, setInput }) {
 
     const [notificationType, setNotificationType] = useState("")
     const [url, setUrl] = useState("")
+    const [error, setError] = useState("")
 
     const handleCheckboxChange = (e) => {
         const selectedValue = e.target.value;
@@ -18,10 +19,21 @@ function AddUrlForm({ toggleForm, setInput }) {
     };
 
     const addUrl = async () => {
-        if (notificationType === "") {
-            throw Error("please slect alert option")
+        if (url === "") {
+            setError("Please enter a URL")
+            return;
         }
-        await useDashboard.addUrl(url, notificationType)
+
+        if (notificationType === "") {
+            setError("Please select a notification type")
+            return;
+        }
+
+        const response = await useDashboard.addUrl(url, notificationType)
+        if (!response) {
+            setError("Please enter a valid URL")
+            return;
+        }
         await useDashboard.getAllUrls()
         setInput("")
         toggleForm(false)
@@ -29,7 +41,7 @@ function AddUrlForm({ toggleForm, setInput }) {
 
     return (
         <div className='dark:text-white dark:bg-[#222838] text-black w-screen rounded-md sm:w-fit bg-white absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 p-2 z-20 border border-gray-500'>
-            <div className='relative dark:bg-custom-gradient sm:px-32 px-1 py-16'>
+            <div className='relative dark:bg-custom-gradient sm:px-32 px-1 pt-16'>
                 <button className='absolute top-3 right-3 text-2xl hover:scale-110 duration-200' onClick={() => toggleForm(false)}><AiOutlineCloseCircle /></button>
                 <h1 className='text-center text-3xl'>Add URL:</h1>
                 <div>
@@ -68,6 +80,7 @@ function AddUrlForm({ toggleForm, setInput }) {
                     </form>
                 </div>
             </div>
+            <p className='text-center my-8 text-red-500'>{error}</p>
         </div>
     )
 }
