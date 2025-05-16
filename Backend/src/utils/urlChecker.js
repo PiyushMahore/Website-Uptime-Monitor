@@ -25,7 +25,7 @@ const checkUrls = async (urlDesc) => {
 
     await isExist.save({ validateBeforeSave: true });
 
-    if (urlCheck.statusCode >= 500) {
+    if (urlCheck.statusCode >= 400) {
         const alertSend = await alertSender(urlDesc)
         if (!alertSend?.messageId) {
             throw new apiError(500, "failed to send notification")

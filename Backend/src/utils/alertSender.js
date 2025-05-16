@@ -17,7 +17,7 @@ const alertSender = async (receiversdata) => {
     let alert;
 
     if (receiversdata.notificationType === "email") {
-        alert = await mailAlert(user)
+        alert = await mailAlert(user, "Alert: Immediate Attention Required", `Hii ${user.fullName},\n\nWe have detected that your website is currently not responding. This may impact user access and disrupt normal operations. Please look into the issue at your earliest convenience to restore full functionality.\n\nBest regards,\nYour Monitoring System\npiyushmahore41@gmail.com`);
     }
     else if (receiversdata.notificationType === "text") {
         console.log("text")

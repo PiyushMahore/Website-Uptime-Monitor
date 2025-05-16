@@ -76,7 +76,14 @@ const fetchUrls = async (url) => {
 
         request.on('error', (error) => {
             console.error('Error fetching the URL:', error);
-            reject(new apiError(500, "Failed to fetch the URL"));
+            WebUrl.findByIdAndDelete(url._id)
+                .then(() => {
+                    reject(new apiError(500, "Failed to fetch the URL"));
+                })
+                .catch((err) => {
+                    console.error("Error updating URL on error:", err);
+                    reject(new apiError(500, "Failed to fetch the URL"));
+                });
         });
     });
 };
