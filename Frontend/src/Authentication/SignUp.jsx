@@ -57,7 +57,7 @@ function SignUp() {
         if (data) {
             navigate(`/dashboard/user/${data.data._id}`)
         }
-        setMessage("User already exists");
+        setMessage("Email or Mobile Number already exists");
     };
 
     if (useAuth.loading) return <Loading />

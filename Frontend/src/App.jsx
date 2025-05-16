@@ -6,6 +6,7 @@ import Home from './pages/Home'
 import Footer from './components/Footer'
 import { useUserContext } from './Context/UserContextProvider'
 import { Navigate } from 'react-router'
+import Services from './pages/Services'
 
 function App() {
 
@@ -17,6 +18,7 @@ function App() {
     <div className='px-2 sm:px-0'>
       <Home />
       <Feature />
+      <Services />
       <Alerts />
       <Footer />
     </div>

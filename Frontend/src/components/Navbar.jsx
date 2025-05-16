@@ -31,6 +31,9 @@ function Navbar() {
                     <Link to='home' spy={true} smooth={true} offset={50} duration={500} className='cursor-pointer relative px-3 rounded-md py-0.5 after:content-[""] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] dark:after:bg-white after:bg-gray-800 after:scale-x-0 after:origin-bottom-right after:transition-transform after:duration-700 after:ease-out hover:after:scale-x-100 dark:hover:text-white hover:text-black hover:after:origin-bottom-left'>
                         Home
                     </Link>
+                    <Link to='services' spy={true} smooth={true} offset={50} duration={800} className='cursor-pointer relative px-3 rounded-md py-0.5 after:content-[""] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] dark:after:bg-white after:bg-gray-800 after:scale-x-0 after:origin-bottom-right after:transition-transform after:duration-700 after:ease-out hover:after:scale-x-100 dark:hover:text-white hover:text-black hover:after:origin-bottom-left'>
+                        Services
+                    </Link>
                     <Link to='about' spy={true} smooth={true} offset={50} duration={800} className='cursor-pointer relative px-3 rounded-md py-0.5 after:content-[""] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] dark:after:bg-white after:bg-gray-800 after:scale-x-0 after:origin-bottom-right after:transition-transform after:duration-700 after:ease-out hover:after:scale-x-100 dark:hover:text-white hover:text-black hover:after:origin-bottom-left'>
                         About Us
                     </Link>
@@ -60,6 +63,9 @@ function Navbar() {
                         {darkMode ? <IoSunny className='self-end' onClick={lightTheme} size={25} /> : <IoMoon className='self-end' onClick={darkTheme} size={25} />}
                         <Link to='home' spy={true} smooth={true} offset={50} duration={500} className={`relative inline-block ${nav ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300 ease-in-out`}>
                             <div className="underline underline-offset-8">Home</div>
+                        </Link>
+                        <Link to='services' spy={true} smooth={true} offset={50} duration={500} className={`relative inline-block ${nav ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300 ease-in-out`}>
+                            <div className="underline underline-offset-8">Services</div>
                         </Link>
                         <Link to='about' spy={true} smooth={true} offset={50} duration={800} className={`relative inline-block ${nav ? "translate-x-0" : "-translate-x-full"} transition-transform duration-500 ease-in-out`}>
                             <div className="underline underline-offset-8">About Us</div>
