@@ -85,7 +85,7 @@ function UserDashboard() {
 
                 {addUrlForm ? <AddUrlForm toggleForm={setAddUrlForm} setInput={setSearchInput} /> : ""}
 
-                <div className={`mt-12 ${addUrlForm ? "blur-sm" : ""} duration-300 overflow-hidden`}>
+                <div className={`pb-4 mt-12 ${addUrlForm ? "blur-sm" : ""} duration-300 overflow-hidden`}>
                     <div className={`border border-gray-500 rounded-lg ${webDisplay ? "max-h-[1000px]" : "max-h-[43px] border-0"} transition-all duration-500 ease-in-out`}>
                         <span className={`flex items-center justify-between gap-2 px-5 py-2 border border-gray-500 rounded-md ${webDisplay ? "rounded-b-none" : ""}`}>
                             <span className='flex items-center gap-2'>
