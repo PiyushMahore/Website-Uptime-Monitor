@@ -1,118 +1,59 @@
-import React, { useState } from 'react';
-import { useUserContext } from '../Context/UserContextProvider';
-import { useNavigate } from "react-router-dom"
-import Loading from '../components/Loading';
-import { IoMdArrowBack } from 'react-icons/io';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { IoMdArrowBack } from "react-icons/io";
+import { useUserContext } from "../Context/UserContextProvider";
+import Loading from "../components/Loading";
 
 function Verify() {
-    const theme = localStorage.getItem("theme")
-    document.body.classList.add(theme)
+    const auth = useUserContext();
+    const navigate = useNavigate();
+    const [email, setEmail] = useState("");
+    const [otp, setOtp] = useState("");
+    const [requested, setRequested] = useState(false);
+    const [message, setMessage] = useState("");
 
-    const useAuth = useUserContext()
-    const navigate = useNavigate()
-
-    const [email, setEmail] = useState("")
-    const [otp, setOtp] = useState("")
-    const [generatedOtp, setGeneratedOtp] = useState(null)
-    const [text, setText] = useState("Generate otp")
-    const [otpField, setOtpField] = useState(false)
-
-    const generateOtp = async () => {
-        let otp = ""
-        for (let i = 0; i <= 6; i++) {
-            otp += Math.floor(Math.random() * 10)
-        }
-        if (email.trim() === "") return null
-        setGeneratedOtp(otp)
-        setText("Verify")
-        setOtpField(true)
-        const response = await useAuth.generateOtp(email, `Your One-Time Password (OTP) is: ${otp}\n\nPlease use this code to complete your verification.\n\nIf you didn’t request this, please ignore this message.`, "Your OTP Code")
-        console.log(response)
-    }
-
-    const isOtpCorrect = () => {
-        useAuth.setLoading(true)
-        setTimeout(() => {
-            useAuth.setLoading(false)
-        }, 500);
-        if (generatedOtp == otp) {
-            navigate(`/login/create-new-password/${email}`)
+    const requestCode = async (event) => {
+        event.preventDefault();
+        setMessage("");
+        const result = await auth.generateOtp(email.trim());
+        if (result?.success) {
+            setRequested(true);
+            setMessage("If that account exists, a reset code has been sent.");
         } else {
-            window.alert("Wrong OTP")
+            setMessage("We could not send a reset code. Please try again shortly.");
         }
-    }
+    };
 
-    console.log(generatedOtp)
-    if (useAuth.loading) return <Loading />
+    const continueReset = (event) => {
+        event.preventDefault();
+        if (!/^\d{6}$/.test(otp)) {
+            setMessage("Enter the 6 digit code from your email.");
+            return;
+        }
+        navigate("/login/create-new-password/" + encodeURIComponent(email.trim()), { state: { otp } });
+    };
+
+    if (auth.loading) return <Loading />;
 
     return (
-        <div className='max-h-screen overflow-hidden'>
-            <div>
-                <span className='flex px-2 py-2'><IoMdArrowBack onClick={() => window.history.back()} size={25} /></span>
-                <hr className='border border-black dark:border-gray-300' />
-            </div>
-            <div className="flex sm:h-screen flex-1 flex-col justify-center items-center px-6 py-12 lg:px-8">
-                <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-                    <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900 dark:text-white">
-                        Verify Yourself
-                    </h2>
+        <main className="min-h-screen px-4 py-8">
+            <button type="button" className="mb-6 flex items-center gap-2" onClick={() => navigate(-1)}><IoMdArrowBack /> Back</button>
+            <form onSubmit={requested ? continueReset : requestCode} className="mx-auto w-full max-w-md space-y-5 rounded-xl border border-gray-300 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-slate-900 sm:p-8">
+                <h1 className="text-center text-2xl font-bold text-gray-900 dark:text-white">Reset your password</h1>
+                <div>
+                    <label htmlFor="reset-email" className="mb-1 block text-sm font-medium">Email address</label>
+                    <input id="reset-email" type="email" autoComplete="email" required value={email} onChange={(event) => setEmail(event.target.value)} className="w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900" />
                 </div>
-
-                <div className="mt-10 mx-auto w-full max-w-sm">
-                    <div className="space-y-6">
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                                Enter Your Email
-                            </label>
-                            <div className="mt-2">
-                                <input
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    required
-                                    className="block w-full rounded-md border-0 py-1.5 px-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                />
-                            </div>
-                        </div>
-
-                        <div className={`${otpField ? "" : "hidden"}`}>
-                            <div className="flex items-center justify-between">
-                                <label htmlFor="otp" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                                    Enter OTP
-                                </label>
-                                <div className="text-sm">
-                                    <button onClick={generateOtp} className="font-semibold text-indigo-600 hover:text-indigo-500">
-                                        Resend
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="mt-2">
-                                <input
-                                    value={otp}
-                                    onChange={(e) => setOtp(e.target.value)}
-                                    id="otp"
-                                    name="otp"
-                                    type="number"
-                                    className="block w-full rounded-md border-0 py-1.5 p-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <button
-                                onClick={text === "Generate otp" ? generateOtp : isOtpCorrect}
-                                className={`flex w-full justify-center rounded-md ${text !== "Generate otp" ? "bg-green-600 focus-visible:outline-green-600 hover:bg-green-500" : "bg-indigo-600 hover:bg-indigo-500 focus:ring-indigo-600"} px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2`}
-                            >
-                                {text}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    )
+                {requested && <div>
+                    <label htmlFor="reset-otp" className="mb-1 block text-sm font-medium">6 digit reset code</label>
+                    <input id="reset-otp" type="text" inputMode="numeric" autoComplete="one-time-code" maxLength={6} required value={otp} onChange={(event) => setOtp(event.target.value.replace(/\D/g, ""))} className="w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900" />
+                </div>}
+                {message && <p role="status" className="text-sm text-indigo-600">{message}</p>}
+                <button className="w-full rounded-md bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-500" type="submit">{requested ? "Continue" : "Send reset code"}</button>
+                {requested && <button className="w-full text-sm text-indigo-600" type="button" onClick={requestCode}>Resend code</button>}
+            </form>
+        </main>
+    );
 }
 
-export default Verify
+export default Verify;

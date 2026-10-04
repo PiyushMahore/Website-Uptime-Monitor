@@ -1,189 +1,133 @@
-import React, { useEffect, useState } from 'react'
-import coverImg from '../../public/Rectangle.png'
-import Loading from '../components/Loading';
-import { useUserContext } from '../Context/UserContextProvider';
+import { useEffect, useRef, useState } from 'react'
+import { Navigate, NavLink } from 'react-router-dom'
+import { HiArrowLeft, HiCamera, HiCheckCircle, HiPencilSquare, HiXMark } from 'react-icons/hi2'
+import Loading from '../components/Loading'
 import defaultProfilePic from '../../public/defaultProfile.jpg'
-import LogoutForm from '../components/LogoutForm';
+import LogoutForm from '../components/LogoutForm'
+import { useUserContext } from '../Context/UserContextProvider'
 
 function Profile() {
-    const useAuth = useUserContext()
-
-    const [isEditable, setEditable] = useState(false);
-    const [fullName, setFullName] = useState("");
-    const [userName, setUserName] = useState("");
-    const [mobileNumber, setMobileNumber] = useState("");
-    const [email, setEmail] = useState("");
+    const auth = useUserContext()
+    const fileInput = useRef(null)
+    const [isEditable, setEditable] = useState(false)
+    const [fullName, setFullName] = useState('')
+    const [userName, setUserName] = useState('')
+    const [mobileNumber, setMobileNumber] = useState('')
+    const [email, setEmail] = useState('')
     const [logOutForm, setLogOutForm] = useState(false)
-    const [profilePicture, setProfilePicture] = useState(null); // Store the file here
-    const [previewImage, setPreviewImage] = useState(''); // Store the base64 preview here
-    const [message, setMessage] = useState("");
+    const [profilePicture, setProfilePicture] = useState(null)
+    const [previewImage, setPreviewImage] = useState('')
+    const [message, setMessage] = useState('')
+    const [saving, setSaving] = useState(false)
 
     useEffect(() => {
-        if (useAuth.user) {
-            setFullName(useAuth.user.fullName)
-            setEmail(useAuth.user.email)
-            setUserName(useAuth.user.userName)
-            setMobileNumber(useAuth.user.mobileNumber)
-            setPreviewImage(useAuth.user.profilePicture)
-            setProfilePicture(useAuth.user.profilePicture)
-        }
-    }, [useAuth.user])
+        if (!auth.user) return
+        setFullName(auth.user.fullName || '')
+        setEmail(auth.user.email || '')
+        setUserName(auth.user.userName || '')
+        setMobileNumber(auth.user.mobileNumber || '')
+        setPreviewImage(auth.user.profilePicture || '')
+        setProfilePicture(null)
+    }, [auth.user])
 
-    const updateUser = async () => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            setMessage("Please enter a valid email address");
-            return;
-        }
+    useEffect(() => () => {
+        if (previewImage.startsWith('blob:')) URL.revokeObjectURL(previewImage)
+    }, [previewImage])
 
-        const mobileRegex = /^[6-9]\d{9}$/;
-        if (!mobileRegex.test(mobileNumber)) {
-            setMessage("Please enter a valid mobile number");
-            return;
-        }
-
-        const userNameRegex = /^[a-zA-Z0-9_]{3,}$/;
-        if (!userNameRegex.test(userName)) {
-            setMessage("User name must be at least 3 characters long and can only contain letters, numbers, and underscores");
-            return;
-        }
-
-        await useAuth.updateUser(userName, "", "", email, mobileNumber, fullName, profilePicture)
-        setEditable(!isEditable)
-        setMessage("Profile updated successfully");
-        setTimeout(() => {
-            setMessage("")
-        }, 2000);
+    const cancelEdit = () => {
+        setFullName(auth.user.fullName || '')
+        setEmail(auth.user.email || '')
+        setUserName(auth.user.userName || '')
+        setMobileNumber(auth.user.mobileNumber || '')
+        setPreviewImage(auth.user.profilePicture || '')
+        setProfilePicture(null)
+        setMessage('')
+        setEditable(false)
     }
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setProfilePicture(file);
-
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                setPreviewImage(event.target.result);
-            };
-            reader.readAsDataURL(file);
+    const updateUser = async (event) => {
+        event.preventDefault()
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!emailRegex.test(email)) return setMessage('Enter a valid email address.')
+        if (!/^[6-9]\d{9}$/.test(mobileNumber)) return setMessage('Enter a valid 10 digit mobile number.')
+        if (!/^[a-zA-Z0-9_]{3,}$/.test(userName)) return setMessage('Username must be at least 3 characters and use letters, numbers, or underscores.')
+        setSaving(true)
+        setMessage('')
+        let result
+        try {
+            result = await auth.updateUser(userName, '', '', email, mobileNumber, fullName, profilePicture)
+        } catch {
+            result = { success: false, message: 'Unable to save your profile. Please try again.' }
+        } finally {
+            setSaving(false)
         }
-    };
+        if (result?.success === false || typeof result === 'string') {
+            setMessage(typeof result === 'string' ? result : result.message || 'Unable to save profile changes.')
+            return
+        }
+        setEditable(false)
+        setMessage('Your profile has been updated.')
+    }
 
-    if (useAuth.loading || !useAuth.user) return <Loading />
+    const handleImageChange = (event) => {
+        const file = event.target.files?.[0]
+        if (!file) return
+        if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type)) return setMessage('Choose a JPEG, PNG, WebP, or GIF image.')
+        if (file.size > 5 * 1024 * 1024) return setMessage('Profile photos must be smaller than 5 MB.')
+        setProfilePicture(file)
+        setPreviewImage(URL.createObjectURL(file))
+        event.target.value = ''
+        setMessage('')
+    }
+
+    if (auth.loading) return <Loading />
+    if (!auth.user) return <Navigate to="/login" replace />
+
+    const fields = [
+        { label: 'Full name', value: fullName, set: setFullName, id: 'profile-name', type: 'text', autoComplete: 'name' },
+        { label: 'Username', value: userName, set: setUserName, id: 'profile-username', type: 'text', autoComplete: 'username' },
+        { label: 'Email address', value: email, set: setEmail, id: 'profile-email', type: 'email', autoComplete: 'email' },
+        { label: 'Mobile number', value: mobileNumber, set: setMobileNumber, id: 'profile-mobile', type: 'tel', autoComplete: 'tel' },
+    ]
 
     return (
-        <div className='h-screen w-screen sm:px-10 sm:pt-20 overflow-hidden'>
-            <div className='sm:border h-full sm:h-auto rounded-lg border-gray-300 dark:bg-[#1F2433] bg-gray-100'>
-                <div className='p-3 flex justify-between items-center'>
-                    <h3>Basic Info</h3>
-                    <div className='text-center hidden sm:flex justify-center'>
-                        <button onClick={() => setLogOutForm(true)} className='bg-red-600 hover:bg-red-500 px-4 py-1.5 rounded hover:scale-105 duration-100'>Log Out</button>
-                    </div>
-                </div>
-                <hr />
-                <div className='flex sm:items-center items-start justify-between pr-1 sm:pr-6 px-6'>
-                    <div className='flex gap-4 py-6'>
-                        <img
-                            className="h-24 w-24 rounded-full relative bg-center bg-cover cursor-pointer"
-                            src={previewImage || defaultProfilePic}
-                            alt="Profile"
-                            onClick={() => isEditable ? document.getElementById('fileInput').click() : ""} // Trigger input click
-                        />
+        <main className="profile-page">
+            <header className="profile-topbar">
+                <NavLink to={`/dashboard/user/${auth.user._id}`} className="profile-back"><HiArrowLeft /> Back to dashboard</NavLink>
+                <span className="profile-brand"><span className="brand-mark"><span /></span>pulse<span>check</span></span>
+                <button className="profile-logout" onClick={() => setLogOutForm(true)}>Log out</button>
+            </header>
+            <div className="profile-layout">
+                <section className="profile-intro">
+                    <span className="section-kicker">ACCOUNT SETTINGS</span>
+                    <h1>Your profile</h1>
+                    <p>Manage your personal details and how we can reach you about your monitors.</p>
+                </section>
 
-                        {/* Hidden input for file selection */}
-                        <input
-                            type="file"
-                            id="fileInput"
-                            style={{ display: 'none' }}
-                            accept="image/*"
-                            onChange={handleImageChange} // Handle file selection
-                        />
-                        <div className='mt-5 sm:mt-1.5 translate-y-4'>
-                            <p className='font-bold'>{useAuth.user.fullName}</p>
-                            <p>{useAuth.user.email}</p>
+                <section className="profile-card">
+                    <div className="profile-card-head"><div><h2>Personal information</h2><p>These details are attached to your account.</p></div>
+                        {!isEditable ? <button className="profile-primary" onClick={() => { setMessage(''); setEditable(true) }}><HiPencilSquare /> Edit profile</button> : <button className="profile-cancel" onClick={cancelEdit}><HiXMark /> Cancel</button>}
+                    </div>
+                    <div className="profile-avatar-row">
+                        <button type="button" className={`profile-avatar-button ${isEditable ? 'is-editable' : ''}`} onClick={() => isEditable && fileInput.current?.click()} aria-label={isEditable ? 'Change profile photo' : 'Profile photo'}>
+                            <img src={previewImage || defaultProfilePic} alt="Profile" />
+                            {isEditable && <span><HiCamera /> Change photo</span>}
+                        </button>
+                        <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden onChange={handleImageChange} />
+                        <div><h3>{auth.user.fullName}</h3><p>{auth.user.email}</p><span className="profile-member-label">Pulsecheck member</span></div>
+                    </div>
+                    <form onSubmit={updateUser}>
+                        <div className="profile-fields">
+                            {fields.map((field) => <label key={field.id} htmlFor={field.id}>{field.label}<input id={field.id} name={field.id} type={field.type} autoComplete={field.autoComplete} value={field.value} onChange={(event) => field.set(event.target.value)} readOnly={!isEditable} /></label>)}
                         </div>
-                    </div>
-                    <div className='mt-2 sm:mt-0'>
-                        <button onClick={() => isEditable ? updateUser() : setEditable(!isEditable)} className={`${isEditable ? "bg-green-500 hover:bg-green-400" : "bg-indigo-500 hover:bg-indigo-400"} py-1 px-6 rounded-md`}>{!isEditable ? "Edit" : "Save"}</button>
-                    </div>
-                </div>
-
-                <div className='px-6 pb-10 grid grid-cols-1 sm:grid-cols-2 gap-10'>
-                    <div>
-                        <label htmlFor="full-name" className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                            Full Name
-                        </label>
-                        <div className="mt-2">
-                            <input
-                                value={fullName}
-                                onChange={(e) => setFullName(e.target.value)}
-                                id="full-name"
-                                name="full-name"
-                                type="text"
-                                readOnly={!isEditable}
-                                className={`w-full ${isEditable ? "focus:ring-2 focus:ring-inset focus:ring-indigo-600" : "focus:outline-none"} rounded-md border-0 py-1.5 px-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6`}
-                            />
-                        </div>
-                    </div>
-
-                    <div>
-                        <label htmlFor="username" className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                            User Name
-                        </label>
-                        <div className="mt-2">
-                            <input
-                                value={userName}
-                                onChange={(e) => setUserName(e.target.value)}
-                                id="username"
-                                name="username"
-                                type="text"
-                                readOnly={!isEditable}
-                                className={`w-full ${isEditable ? "focus:ring-2 focus:ring-inset focus:ring-indigo-600" : "focus:outline-none"} rounded-md border-0 py-1.5 px-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6`}
-                            />
-                        </div>
-                    </div>
-
-                    <div>
-                        <label htmlFor="mobile" className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                            Mobile Number
-                        </label>
-                        <div className="mt-2">
-                            <input
-                                value={mobileNumber}
-                                onChange={(e) => setMobileNumber(e.target.value)}
-                                id="mobile"
-                                name="mobile"
-                                type="tel"
-                                readOnly={!isEditable}
-                                className={`w-full ${isEditable ? "focus:ring-2 focus:ring-inset focus:ring-indigo-600" : "focus:outline-none"} rounded-md border-0 py-1.5 px-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6`}
-                            />
-                        </div>
-                    </div>
-
-                    <div>
-                        <label htmlFor="email" className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                            Email
-                        </label>
-                        <div className="mt-2">
-                            <input
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                id="email"
-                                name="email"
-                                type="email"
-                                readOnly={!isEditable}
-                                className={`w-full ${isEditable ? "focus:ring-2 focus:ring-inset focus:ring-indigo-600" : "focus:outline-none"} rounded-md border-0 py-1.5 px-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6`}
-                            />
-                        </div>
-                    </div>
-                </div>
-                <p className={`text-center ${message != "Profile updated successfully" ? "text-red-500" : "text-green-500"} pb-4`}>{message}</p>
-                <div className='text-center mt-6 sm:hidden'>
-                    <button onClick={() => setLogOutForm(true)} className='bg-red-600 px-4 py-1.5 rounded hover:scale-105 duration-100'>Log Out</button>
-                </div>
+                        {message && <p className={`profile-message ${message.includes('updated') ? 'is-success' : 'is-error'}`}>{message.includes('updated') && <HiCheckCircle />}{message}</p>}
+                        {isEditable && <div className="profile-form-actions"><p>Your email and mobile number are used for account notices.</p><button className="profile-primary" type="submit" disabled={saving}>{saving ? 'Saving…' : 'Save changes'}</button></div>}
+                    </form>
+                </section>
+                <section className="profile-security-card"><div><h2>Account access</h2><p>Sign out of Pulsecheck on this device.</p></div><button onClick={() => setLogOutForm(true)}>Log out</button></section>
             </div>
             {logOutForm ? <LogoutForm setLogoutForm={setLogOutForm} /> : null}
-        </div>
+        </main>
     )
 }
 

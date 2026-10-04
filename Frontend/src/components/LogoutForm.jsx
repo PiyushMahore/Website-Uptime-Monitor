@@ -1,25 +1,50 @@
-import React from 'react'
+import { useEffect, useState } from 'react'
+import PropTypes from 'prop-types'
+import { HiArrowRightOnRectangle, HiOutlineExclamationTriangle, HiXMark } from 'react-icons/hi2'
 import { useUserContext } from '../Context/UserContextProvider'
+import { useDashboardContext } from '../Context/DashboardContextProvider'
 import { useNavigate } from 'react-router-dom'
 
 function LogoutForm({ setLogoutForm }) {
-    const useAuth = useUserContext()
+    const auth = useUserContext()
+    const dashboard = useDashboardContext()
     const navigate = useNavigate()
+    const [busy, setBusy] = useState(false)
+    const [error, setError] = useState('')
+
+    useEffect(() => {
+        const closeOnEscape = (event) => { if (event.key === 'Escape' && !busy) setLogoutForm(false) }
+        window.addEventListener('keydown', closeOnEscape)
+        return () => window.removeEventListener('keydown', closeOnEscape)
+    }, [busy, setLogoutForm])
 
     const logout = async () => {
-        await useAuth.logOut()
-            .then(() => navigate("/"))
+        setBusy(true)
+        setError('')
+        const result = await auth.logOut()
+        if (typeof result === 'string' || result?.success === false) {
+            setError(result?.message || 'We could not sign you out. Please try again.')
+            setBusy(false)
+            return
+        }
+        dashboard.clearUrls()
+        navigate('/')
     }
 
     return (
-        <div className={`absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 dark:bg-[#222838] bg-white h-44 w-screen sm:w-fit flex justify-center flex-col items-center border dark:border-gray-500 border-black p-2 sm:px-16 rounded-2xl z-20`}>
-            <h1 className='text-2xl'>Log Out</h1>
-            <div className='flex gap-8 mt-4'>
-                <button className='py-2 px-3 dark:bg-[#222838] border border-gray-500 rounded-md' onClick={() => setLogoutForm(false)}>Cancel</button>
-                <button onClick={logout} className='py-2 px-3 bg-red-500 rounded-md'>Log Out</button>
-            </div>
+        <div className="logout-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !busy) setLogoutForm(false) }}>
+            <section className="logout-modal" role="dialog" aria-modal="true" aria-labelledby="logout-title">
+                <button className="logout-modal-close" type="button" aria-label="Close" onClick={() => setLogoutForm(false)} disabled={busy}><HiXMark /></button>
+                <span className="logout-modal-icon"><HiArrowRightOnRectangle /></span>
+                <span className="section-kicker">ACCOUNT</span>
+                <h2 id="logout-title">Sign out of Pulsecheck?</h2>
+                <p>You can sign back in any time to check your monitors and alert settings.</p>
+                {error && <div className="logout-modal-error" role="alert"><HiOutlineExclamationTriangle />{error}</div>}
+                <div className="logout-modal-actions"><button type="button" className="logout-cancel" onClick={() => setLogoutForm(false)} disabled={busy}>Stay signed in</button><button type="button" className="logout-confirm" onClick={logout} disabled={busy}>{busy ? 'Signing out…' : 'Sign out'}</button></div>
+            </section>
         </div>
     )
 }
 
+LogoutForm.propTypes = { setLogoutForm: PropTypes.func.isRequired }
 export default LogoutForm

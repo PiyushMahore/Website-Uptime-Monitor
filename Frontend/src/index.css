@@ -1,45 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  font-family: 'DM Sans', Inter, system-ui, sans-serif;
+  color: #1b2030;
+  background: #fafbff;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --ink: #1b2030;
+  --muted: #747b8e;
+  --paper: #fafbff;
+  --surface: #fff;
+  --line: #e9ebf2;
+  --accent: #596fee;
+  --accent-strong: #465de0;
+  --green: #1db87a;
+  --soft-accent: #f0f2ff;
+  --section-alt: #f3f5fb;
 }
 
-body {
-  @apply bg-gray-100 text-gray-900;
-}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+body { margin: 0; min-width: 320px; min-height: 100vh; color: var(--ink); background: var(--paper); transition: color .2s, background .2s; }
+body.dark { --ink: #edf0fa; --muted: #a0a8bc; --paper: #10131d; --surface: #181d2a; --line: #2b3141; --accent: #8293ff; --accent-strong: #7184ff; --soft-accent: #242b45; --section-alt: #141925; background: var(--paper); color: var(--ink); }
+button, input { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+a { color: inherit; }
+button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid #8190ff; outline-offset: 3px; }
+::selection { color: #fff; background: #596fee; }
+#root { min-height: 100vh; }
 
-body.dark {
-  @apply bg-[#0B0C14]; /* Tailwind custom color for dark mode background */
-  color: rgba(255, 255, 255, 0.87); /* Dark mode text color */
-}
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+.spin { animation: fadeInUp .55s ease-out both; }
+.divider:after, .divider:before { content: ""; flex: 1; height: 1px; background: var(--line); }
 
-@keyframes fadeInUp {
-  0% { 
-    opacity: 0;
-    transform: translateY(100%);
-   }
-  100% { 
-    opacity: 1;
-    transform: translateY(0);
-   }
-}
-
-.spin {
-  animation: fadeInUp 1s ease-out forwards;
-}
-
-.divider:after,
-.divider:before {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: #eee;
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }

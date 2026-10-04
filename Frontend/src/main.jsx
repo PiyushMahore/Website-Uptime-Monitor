@@ -14,42 +14,51 @@ import UrlDashboard from '../src/Dashboard/UrlDashboard.jsx'
 import Verify from './Authentication/Verify.jsx';
 import CreateNewPassword from './Authentication/CreateNewPassword.jsx';
 import Profile from './pages/Profile.jsx';
+import RouteErrorPage from './components/RouteErrorPage.jsx';
 
 const theme = localStorage.getItem('theme')
-document.body.classList.add(theme)
+document.body.classList.toggle('dark', theme === 'dark')
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <App />
+    element: <App />,
+    errorElement: <RouteErrorPage />
   },
   {
     path: '/sign-up',
-    element: <SignUp />
+    element: <SignUp />,
+    errorElement: <RouteErrorPage />
   },
   {
     path: '/login',
-    element: <Login />
+    element: <Login />,
+    errorElement: <RouteErrorPage />
   },
   {
     path: '/login/reset-password',
-    element: <Verify />
+    element: <Verify />,
+    errorElement: <RouteErrorPage />
   },
   {
     path: '/login/create-new-password/:email',
-    element: <CreateNewPassword />
+    element: <CreateNewPassword />,
+    errorElement: <RouteErrorPage />
   },
   {
     path: '/dashboard/user/:id',
-    element: <UserDashboard />
+    element: <UserDashboard />,
+    errorElement: <RouteErrorPage />
   },
   {
     path: '/dashboard/profile/:userId',
-    element: <Profile />
+    element: <Profile />,
+    errorElement: <RouteErrorPage />
   },
   {
     path: '/dashboard/:id/url/:urlId',
-    element: <UrlDashboard />
+    element: <UrlDashboard />,
+    errorElement: <RouteErrorPage />
   }
 ]);
 
