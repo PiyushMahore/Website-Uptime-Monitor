@@ -1,112 +1,51 @@
-import React, { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router'
-import { useUserContext } from '../Context/UserContextProvider'
-import Loading from '../components/Loading'
-import { IoMdArrowBack } from 'react-icons/io'
+import { useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useUserContext } from "../Context/UserContextProvider";
+import Loading from "../components/Loading";
 
 function CreateNewPassword() {
-    const { email } = useParams()
-    const navigate = useNavigate()
+    const { email } = useParams();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const auth = useUserContext();
+    const [otp, setOtp] = useState(location.state?.otp || "");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [message, setMessage] = useState("");
 
-    const [password, setPassword] = useState("")
-    const [confirmPassword, setConfirmPassword] = useState("")
-    const [message, setMessage] = useState("")
+    const changePassword = async (event) => {
+        event.preventDefault();
+        if (!/^\d{6}$/.test(otp)) return setMessage("Enter the 6 digit reset code from your email.");
+        if (password.length < 8) return setMessage("Password must be at least 8 characters long.");
+        if (password !== confirmPassword) return setMessage("Passwords do not match.");
+        const result = await auth.resetPassword(decodeURIComponent(email), otp, password);
+        if (result?.success) navigate("/login", { replace: true });
+        else setMessage(result?.message || "The reset code is invalid or expired.");
+    };
 
-    const useAuth = useUserContext()
-
-    const changePassword = async () => {
-        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
-        if (!passwordRegex.test(password)) {
-            setMessage("Invalid password. Password must be at least 8 characters long, Contain at least one letter & Contain at least one digit, Only use letters, digits, and symbols.");
-            return;
-        }
-        if (password !== confirmPassword) {
-            setMessage("password & confirm password not match")
-            return;
-        }
-        const result = await useAuth.resetPassword(email, password)
-        if (result.message === "Password changed successfully") {
-            navigate("/login")
-        }
-    }
-
-    useEffect(() => {
-        if (confirmPassword.length > 0) {
-            if (password !== confirmPassword) {
-                setMessage("password & confirm password not match")
-            } else {
-                setMessage("")
-            }
-        } else {
-            setMessage("")
-        }
-    }, [confirmPassword, password])
-
-    if (useAuth.loading) return <Loading />
+    if (auth.loading) return <Loading />;
 
     return (
-        <div className='max-h-screen overflow-hidden'>
-            <div>
-                <span className='flex px-2 py-2'><IoMdArrowBack onClick={() => window.history.back()} size={25} /></span>
-                <hr className='border border-black dark:border-gray-300' />
-            </div>
-            <div className="flex sm:h-screen flex-1 flex-col justify-center items-center px-6 py-12 lg:px-8">
-                <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-                    <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900 dark:text-white">
-                        Change Password
-                    </h2>
+        <main className="min-h-screen px-4 py-8">
+            <form onSubmit={changePassword} className="mx-auto mt-10 w-full max-w-md space-y-5 rounded-xl border border-gray-300 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-slate-900 sm:p-8">
+                <h1 className="text-center text-2xl font-bold text-gray-900 dark:text-white">Choose a new password</h1>
+                <div>
+                    <label htmlFor="reset-otp" className="mb-1 block text-sm font-medium">6 digit reset code</label>
+                    <input id="reset-otp" type="text" inputMode="numeric" autoComplete="one-time-code" maxLength={6} required value={otp} onChange={(event) => setOtp(event.target.value.replace(/\D/g, ""))} className="w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900" />
                 </div>
-
-                <div className="mt-10 mx-auto w-full max-w-sm">
-                    <div className="space-y-6">
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                                Enter Password
-                            </label>
-                            <div className="mt-2">
-                                <input
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    id="password"
-                                    name="password"
-                                    type="text"
-                                    required
-                                    className="block w-full rounded-md border-0 py-1.5 px-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <div className="flex items-center justify-between">
-                                <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                                    Confirm Password
-                                </label>
-                            </div>
-                            <div className="mt-2">
-                                <input
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    id="confirmPassword"
-                                    name="confirmPassword"
-                                    type="text"
-                                    className="block w-full rounded-md border-0 py-1.5 p-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <button onClick={changePassword}
-                                className={`flex w-full justify-center rounded-md bg-indigo-600 hover:bg-indigo-500 focus:ring-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2`}
-                            >
-                                Change Password
-                            </button>
-                        </div>
-                        <p className='text-center text-red-500'>{message}</p>
-                    </div>
+                <div>
+                    <label htmlFor="new-password" className="mb-1 block text-sm font-medium">New password</label>
+                    <input id="new-password" type="password" autoComplete="new-password" minLength={8} required value={password} onChange={(event) => setPassword(event.target.value)} className="w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900" />
                 </div>
-            </div>
-        </div>
-    )
+                <div>
+                    <label htmlFor="confirm-password" className="mb-1 block text-sm font-medium">Confirm password</label>
+                    <input id="confirm-password" type="password" autoComplete="new-password" required value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} className="w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900" />
+                </div>
+                {message && <p role="alert" className="text-sm text-red-600">{message}</p>}
+                <button type="submit" className="w-full rounded-md bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-500">Change password</button>
+            </form>
+        </main>
+    );
 }
 
-export default CreateNewPassword
+export default CreateNewPassword;

@@ -1,4 +1,3 @@
-import React from 'react'
 import './App.css'
 import Feature from './pages/Feature'
 import Alerts from './pages/Alerts'
@@ -15,7 +14,7 @@ function App() {
   if (useAuth.user) return <Navigate to={`/dashboard/user/${useAuth.user._id}`} />
 
   return (
-    <div className='px-2 sm:px-0'>
+    <div>
       <Home />
       <Feature />
       <Services />

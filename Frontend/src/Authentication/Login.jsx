@@ -1,129 +1,68 @@
-import React, { useEffect, useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom'
-import Loading from '../components/Loading';
-import { useUserContext } from '../Context/UserContextProvider';
-import { IoMdArrowBack } from "react-icons/io";
-import { Navigate } from 'react-router-dom';
+import { useState } from "react";
+import { NavLink, Navigate, useNavigate } from "react-router-dom";
+import { HiArrowLeft, HiArrowRight, HiCheck, HiEye, HiEyeSlash, HiLockClosed } from "react-icons/hi2";
+import Loading from "../components/Loading";
+import { useUserContext } from "../Context/UserContextProvider";
 
 function Login() {
-    const theme = localStorage.getItem("theme")
-    document.body.classList.add(theme)
-    const [message, setMessage] = useState("")
-    const navigate = useNavigate()
-    const useAuth = useUserContext()
+    const useAuth = useUserContext();
+    const navigate = useNavigate();
+    const [credential, setCredential] = useState("");
+    const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [message, setMessage] = useState("");
 
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-
-    const logIn = async () => {
-        if (!email || !password) {
-            setMessage("Please fill all fields")
+    const logIn = async (event) => {
+        event.preventDefault();
+        setMessage("");
+        if (!credential.trim() || !password) {
+            setMessage("Enter your email or username and password to continue.");
             return;
         }
 
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            setMessage("Please enter a valid email address");
-            return;
+        const response = await useAuth.login(credential.trim(), password);
+        if (response?.data?._id) {
+            navigate(`/dashboard/user/${response.data._id}`);
+        } else {
+            setMessage(response?.message || (response === "Password is Wrong" ? "The password you entered is incorrect." : "We couldn't sign you in. Check your details and try again."));
         }
+    };
 
-        const data = await useAuth.login(email, password)
-
-        if (data?.data?._id) {
-            navigate(`/dashboard/user/${data.data._id}`)
-        } else if (data == "Password is Wrong" || data.data === "Password is Wrong") {
-            setMessage("Password is Wrong");
-        } else if (data?.data === "user not found") {
-            setMessage("User Not Found")
-        }
-    }
-
-    useEffect(() => {
-        if (password.length <= 0) {
-            setMessage("")
-        } else if (email.length <= 0) {
-            setMessage("")
-        }
-    }, [password, email])
-
-    if (useAuth.loading) return <Loading />
-
-    if (useAuth.user) return <Navigate to={`/dashboard/user/${useAuth.user._id}`} />
+    if (useAuth.loading) return <Loading />;
+    if (useAuth.user) return <Navigate to={`/dashboard/user/${useAuth.user._id}`} replace />;
 
     return (
-        <div className='max-h-screen overflow-hidden'>
-            <div>
-                <span className='flex px-2 py-2'><IoMdArrowBack onClick={() => window.history.back()} size={25} /></span>
-                <hr className='border border-black dark:border-gray-300' />
+        <main className="auth-page">
+            <NavLink to="/" className="auth-back"><HiArrowLeft /> <span>Back to home</span></NavLink>
+            <div className="auth-layout">
+                <section className="auth-aside">
+                    <NavLink to="/" className="brand"><span className="brand-mark"><span /></span><span>pulse<span className="brand-light">check</span></span></NavLink>
+                    <div className="auth-aside-copy">
+                        <span className="auth-kicker"><i /> YOUR SERVICES, IN GOOD HANDS</span>
+                        <h1>More uptime.<br /><span>Less worry.</span></h1>
+                        <p>Get a clear view of the services your customers count on, with helpful alerts when something needs your attention.</p>
+                        <div className="auth-benefits"><span><HiCheck /> Live service health</span><span><HiCheck /> Useful alerts, right on time</span><span><HiCheck /> Simple, clear monitoring</span></div>
+                    </div>
+                    <div className="auth-aside-foot"><HiLockClosed /> Your account is protected with secure sign in.</div>
+                    <div className="auth-decoration auth-decoration-one"/><div className="auth-decoration auth-decoration-two"/>
+                </section>
+                <section className="auth-main">
+                    <div className="auth-form-wrap">
+                        <div className="auth-heading"><span className="auth-mobile-brand"><span className="brand-mark"><span /></span> pulsecheck</span><span className="auth-kicker">WELCOME BACK</span><h2>Sign in to your account</h2><p>Pick up right where you left off.</p></div>
+                        <form className="auth-form" onSubmit={logIn} noValidate>
+                            <label className="auth-field"><span>Email or username</span><input value={credential} onChange={(event) => setCredential(event.target.value)} name="username" type="text" autoComplete="username" placeholder="you@example.com or username" required /></label>
+                            <label className="auth-field"><span>Password</span><span className="auth-password-wrap"><input value={password} onChange={(event) => setPassword(event.target.value)} name="password" type={showPassword ? "text" : "password"} autoComplete="current-password" placeholder="Enter your password" required /><button type="button" className="auth-show-password" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? "Hide password" : "Show password"}>{showPassword ? <HiEyeSlash /> : <HiEye />}</button></span></label>
+                            <div className="auth-inline-link"><NavLink to="/login/reset-password">Forgot password?</NavLink></div>
+                            {message && <p className="auth-message" role="alert">{message}</p>}
+                            <button className="auth-submit" type="submit">Sign in <HiArrowRight /></button>
+                        </form>
+                        <p className="auth-switch">New to Pulsecheck? <NavLink to="/sign-up">Create an account</NavLink></p>
+                        <p className="auth-legal">By continuing, you agree to use Pulsecheck responsibly.</p>
+                    </div>
+                </section>
             </div>
-            <div className="flex sm:h-screen flex-1 flex-col justify-center items-center px-6 py-12 lg:px-8">
-                <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-                    <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900 dark:text-white">
-                        Sign in to your account
-                    </h2>
-                </div>
-
-                <div className="mt-10 mx-auto w-full max-w-sm">
-                    <form className="space-y-6">
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                                Email or UserName
-                            </label>
-                            <div className="mt-2">
-                                <input
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    required
-                                    autoComplete="email"
-                                    className="block w-full rounded-md border-0 py-1.5 px-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <div className="flex items-center justify-between">
-                                <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                                    Password
-                                </label>
-                                <div className="text-sm">
-                                    <NavLink to="/login/reset-password" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                                        Forgot password?
-                                    </NavLink>
-                                </div>
-                            </div>
-                            <div className="mt-2">
-                                <input
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    required
-                                    autoComplete="current-password"
-                                    className="block w-full rounded-md border-0 py-1.5 p-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <button
-                                onClick={logIn}
-                                type="submit"
-                                className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                            >
-                                Sign in
-                            </button>
-                            <p className="mt-3 text-lg text-center">New User! <NavLink to={'/sign-up'} className="text-indigo-600">sign Up</NavLink></p>
-                        </div>
-                        <p className='text-center text-red-500'>{message}</p>
-                    </form>
-                </div>
-            </div>
-        </div>
-    )
+        </main>
+    );
 }
 
 export default Login;

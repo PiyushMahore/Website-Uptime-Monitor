@@ -1,21 +1,14 @@
-import React from 'react'
-import FeatureImg from '/FeaturedImg.jpg'
+import { HiArrowTrendingUp, HiCheck, HiOutlineBellAlert, HiOutlineChartBarSquare, HiOutlineGlobeAlt, HiOutlineShieldCheck } from "react-icons/hi2";
+
+const features = [
+    { icon: HiOutlineGlobeAlt, title: "Website checks", text: "Keep an eye on every important endpoint with dependable, scheduled checks." },
+    { icon: HiOutlineBellAlert, title: "Alerts that matter", text: "Know about interruptions early with notifications that help you take action." },
+    { icon: HiOutlineChartBarSquare, title: "Clear performance", text: "Understand response times and recent checks in one simple timeline." },
+    { icon: HiOutlineShieldCheck, title: "Confidence built in", text: "Get a straightforward picture of service health without noisy dashboards." },
+];
 
 function Feature() {
-    return (
-        <div className='mt-12 flex items-center justify-center flex-col-reverse sm:flex-row gap-20 sm:px-40'>
-            <div className='sm:w-[40%] text-left animation'>
-                <h6 style={{ backgroundColor: 'rgb(124 135 247 / 0.1)', borderColor: 'rgb(124 135 247 / 0.36)' }} className='px-3 py-1.5 rounded-full border w-fit'>UPTIME MONITERING</h6>
-                <h1 className='sm:text-6xl text-5xl font-semibold'>
-                    Uptime monitoring reimagined
-                </h1>
-                <p className='sm:text-2xl text-2xl text-gray-500 mt-2'>Get a screenshot of the error, and a second-by-second timeline with our fastest 30-second checks.</p>
-            </div>
-            <div className='sm:w-[100%] w-screen'>
-                <img className='bg-cover bg-center' width={'100%'} src={FeatureImg} alt="" />
-            </div>
-        </div>
-    )
+    return <section id="features" className="features-section section-pad"><div className="page-container"><div className="section-intro"><span className="section-kicker">LESS GUESSWORK, MORE CONFIDENCE</span><h2>Stay ahead of the<br /><span>unexpected.</span></h2><p>Everything you need to spot an issue, understand what happened, and get your service back on track.</p></div><div className="feature-layout"><div className="feature-board"><div className="board-header"><div><span className="board-label">SERVICE HEALTH</span><h3>Your services at a glance</h3></div><span className="board-period">Last 24 hours⌄</span></div><div className="health-summary"><span className="health-icon"><HiCheck /></span><div><strong>All systems operational</strong><small>Every monitor is responding normally</small></div><span className="health-time">Updated just now</span></div><div className="health-row"><span className="mini-favicon">S</span><span className="health-name"><b>storefront.com</b><small>Website · Every 3 min</small></span><span className="health-bars">{Array.from({ length: 24 }, (_, index) => <i key={index} className={index === 14 ? "bar-muted" : ""} />)}</span><span className="health-percent">99.98%</span><span className="health-up">Operational</span></div><div className="health-row"><span className="mini-favicon mini-purple">A</span><span className="health-name"><b>api.storefront.com</b><small>API endpoint · Every 3 min</small></span><span className="health-bars">{Array.from({ length: 24 }, (_, index) => <i key={index} />)}</span><span className="health-percent">100%</span><span className="health-up">Operational</span></div><div className="health-row"><span className="mini-favicon mini-orange">P</span><span className="health-name"><b>payments.storefront.com</b><small>Checkout · Every 3 min</small></span><span className="health-bars">{Array.from({ length: 24 }, (_, index) => <i key={index} className={index === 8 || index === 9 ? "bar-warn" : ""} />)}</span><span className="health-percent">99.95%</span><span className="health-up">Operational</span></div><div className="board-foot"><span><i /> Operational</span><span>3 monitors</span></div></div><div className="feature-copy"><span className="feature-copy-icon"><HiArrowTrendingUp /></span><span className="section-kicker">EVERY SECOND COUNTS</span><h3>Know before it becomes a problem.</h3><p>Small interruptions can turn into lost trust. Pulsecheck keeps watch around the clock and gives you the context to respond with confidence.</p><div className="feature-stat"><strong>99.9%</strong><span>uptime is the goal.<br />Visibility is how you get there.</span></div></div></div><div className="feature-grid">{features.map(({ icon: Icon, title, text }) => <article className="feature-card" key={title}><span className="feature-icon"><Icon /></span><h3>{title}</h3><p>{text}</p></article>)}</div></div></section>;
 }
 
-export default Feature
+export default Feature;

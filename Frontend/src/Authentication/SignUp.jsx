@@ -1,222 +1,105 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { NavLink, Navigate, useNavigate } from "react-router-dom";
+import { HiArrowLeft, HiArrowRight, HiCheck, HiEye, HiEyeSlash, HiLockClosed, HiOutlinePhoto } from "react-icons/hi2";
 import Loading from "../components/Loading";
-import { useNavigate } from "react-router";
 import { useUserContext } from "../Context/UserContextProvider";
-import { NavLink } from "react-router-dom";
-import { IoMdArrowBack } from "react-icons/io";
-import { Navigate } from "react-router";
 
 function SignUp() {
-    const theme = localStorage.getItem("theme")
-    document.body.classList.add(theme)
-
-    const useAuth = useUserContext()
-    const navigate = useNavigate()
-
+    const useAuth = useUserContext();
+    const navigate = useNavigate();
+    const [fullName, setFullName] = useState("");
+    const [userName, setUserName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [mobileNumber, setMobileNumber] = useState("");
+    const [coverImage, setCoverImage] = useState(null);
+    const [showPassword, setShowPassword] = useState(false);
     const [message, setMessage] = useState("");
-
-    const [fullName, setFullName] = useState("")
-    const [userName, setUserName] = useState("")
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-    const [mobileNumber, setMobileNumber] = useState("")
-    const [coverImage, setCoverImage] = useState(null)
-
-    const signUp = async (e) => {
-        e.preventDefault();
-        if (!email || !password || !userName || !fullName || !mobileNumber) {
-            setMessage("Please fill all fields")
+    const handleProfileImageChange = (event) => {
+        const file = event.target.files?.[0] || null;
+        setMessage("");
+        if (!file) { setCoverImage(null); return; }
+        if (!["image/jpeg", "image/png", "image/webp", "image/gif"].includes(file.type)) {
+            setCoverImage(null);
+            event.target.value = "";
+            setMessage("Choose a JPEG, PNG, WebP, or GIF profile image.");
             return;
         }
-
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            setMessage("Please enter a valid email address");
+        if (file.size > 5 * 1024 * 1024) {
+            setCoverImage(null);
+            event.target.value = "";
+            setMessage("Profile images must be 5 MB or smaller.");
             return;
         }
-
-        const mobileRegex = /^[6-9]\d{9}$/;
-        if (!mobileRegex.test(mobileNumber)) {
-            setMessage("Please enter a valid mobile number");
-            return;
-        }
-
-        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
-        if (!passwordRegex.test(password)) {
-            setMessage("Invalid password. Password must be at least 8 characters long, Contain at least one letter & Contain at least one digit, Only use letters, digits, and symbols.");
-            return;
-        }
-
-        const userNameRegex = /^[a-zA-Z0-9_]{3,}$/;
-        if (!userNameRegex.test(userName)) {
-            setMessage("User name must be at least 3 characters long and can only contain letters, numbers, and underscores");
-            return;
-        }
-
-        const data = await useAuth.signUp(fullName, userName, email, password, mobileNumber, coverImage || "");
-        if (data) {
-            navigate(`/dashboard/user/${data.data._id}`)
-        }
-        setMessage("Email or Mobile Number already exists");
+        setCoverImage(file);
     };
 
-    if (useAuth.loading) return <Loading />
+    const signUp = async (event) => {
+        event.preventDefault();
+        setMessage("");
+        if (!fullName.trim() || !email.trim() || !password || !userName.trim() || !mobileNumber.trim()) {
+            setMessage("Complete each required field to create your account.");
+            return;
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+            setMessage("Enter a valid email address.");
+            return;
+        }
+        if (!/^[6-9]\d{9}$/.test(mobileNumber.trim())) {
+            setMessage("Enter a valid 10 digit mobile number.");
+            return;
+        }
+        if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/.test(password)) {
+            setMessage("Use at least 8 characters with at least one letter and one number.");
+            return;
+        }
+        if (!/^[a-zA-Z0-9_]{3,}$/.test(userName.trim())) {
+            setMessage("Usernames need 3 or more letters, numbers, or underscores.");
+            return;
+        }
 
-    if (useAuth.user) return <Navigate to={`/dashboard/user/${useAuth.user._id}`} />
+        const result = await useAuth.signUp(fullName.trim(), userName.trim(), email.trim(), password, mobileNumber.trim(), coverImage || "");
+        if (result?.success && result.data?._id) {
+            navigate(`/dashboard/user/${result.data._id}`);
+            return;
+        }
+        setMessage(result?.message || "Unable to create your account. Please try again.");
+    };
+
+    if (useAuth.loading) return <Loading />;
+    if (useAuth.user) return <Navigate to={`/dashboard/user/${useAuth.user._id}`} replace />;
 
     return (
-        <div className='max-h-screen'>
-            <div>
-                <span className='flex px-2 py-2'><IoMdArrowBack onClick={() => window.history.back()} size={25} /></span>
-                <hr className='border border-black dark:border-gray-300' />
+        <main className="auth-page">
+            <NavLink to="/" className="auth-back"><HiArrowLeft /> <span>Back to home</span></NavLink>
+            <div className="auth-layout auth-layout-signup">
+                <section className="auth-aside">
+                    <NavLink to="/" className="brand"><span className="brand-mark"><span /></span><span>pulse<span className="brand-light">check</span></span></NavLink>
+                    <div className="auth-aside-copy"><span className="auth-kicker"><i /> YOUR SERVICES, IN GOOD HANDS</span><h1>Know sooner.<br /><span>Respond smarter.</span></h1><p>Set up your account and bring your important websites into one simple uptime dashboard.</p><div className="auth-benefits"><span><HiCheck /> Start monitoring in minutes</span><span><HiCheck /> Get alerts when checks fail</span><span><HiCheck /> Keep service health in view</span></div></div>
+                    <div className="auth-aside-foot"><HiLockClosed /> Your account is protected with secure sign in.</div><div className="auth-decoration auth-decoration-one"/><div className="auth-decoration auth-decoration-two"/>
+                </section>
+                <section className="auth-main auth-main-signup">
+                    <div className="auth-form-wrap">
+                        <div className="auth-heading"><span className="auth-mobile-brand"><span className="brand-mark"><span /></span> pulsecheck</span><span className="auth-kicker">GET STARTED</span><h2>Create your account</h2><p>A few details and you’re ready to monitor.</p></div>
+                        <form className="auth-form auth-form-signup" onSubmit={signUp} noValidate>
+                            <div className="auth-fields-grid">
+                                <label className="auth-field"><span>Full name</span><input value={fullName} onChange={(event) => setFullName(event.target.value)} name="fullName" type="text" autoComplete="name" placeholder="Alex Morgan" required /></label>
+                                <label className="auth-field"><span>Username</span><input value={userName} onChange={(event) => setUserName(event.target.value)} name="userName" type="text" autoComplete="username" placeholder="alexmorgan" required /></label>
+                                <label className="auth-field"><span>Email address</span><input value={email} onChange={(event) => setEmail(event.target.value)} name="email" type="email" autoComplete="email" placeholder="you@example.com" required /></label>
+                                <label className="auth-field"><span>Mobile number</span><input value={mobileNumber} onChange={(event) => setMobileNumber(event.target.value.replace(/\D/g, "").slice(0, 10))} name="mobileNumber" type="tel" inputMode="numeric" autoComplete="tel-national" placeholder="10 digit number" required /></label>
+                            </div>
+                            <label className="auth-field"><span>Password</span><span className="auth-password-wrap"><input value={password} onChange={(event) => setPassword(event.target.value)} name="new-password" type={showPassword ? "text" : "password"} autoComplete="new-password" placeholder="Create a secure password" required /><button type="button" className="auth-show-password" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? "Hide password" : "Show password"}>{showPassword ? <HiEyeSlash /> : <HiEye />}</button></span><small className="auth-hint">At least 8 characters, including a letter and a number.</small></label>
+                            <label className="auth-upload"><input type="file" accept=".jpg,.jpeg,.png,.webp,.gif,image/jpeg,image/png,image/webp,image/gif" onChange={handleProfileImageChange} /><span className="auth-upload-icon"><HiOutlinePhoto /></span><span><b>{coverImage ? coverImage.name : "Add a profile photo"}</b><small>Optional: JPEG, PNG, WebP, or GIF (5 MB max)</small></span><span className="auth-upload-action">Browse</span></label>
+                            {message && <p className="auth-message" role="alert">{message}</p>}
+                            <button className="auth-submit" type="submit">Create account <HiArrowRight /></button>
+                        </form>
+                        <p className="auth-switch">Already have an account? <NavLink to="/login">Sign in</NavLink></p>
+                        <p className="auth-legal">By creating an account, you agree to use Pulsecheck responsibly.</p>
+                    </div>
+                </section>
             </div>
-            <div className="flex sm:h-screen flex-1 flex-col justify-center items-center px-6 sm:py-12 lg:px-8">
-                <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-                    <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900 dark:text-white">
-                        Sign up to your account
-                    </h2>
-                    <p className="mt-2 text-center text-sm text-red-600 dark:text-red-500">
-                        {message}
-                    </p>
-                </div>
-
-                <div className="mt-10 mx-auto w-full max-w-sm">
-                    <form onSubmit={signUp} className="space-y-6">
-                        <div>
-                            <label htmlFor="fullName" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                                Full Name
-                            </label>
-                            <div className="mt-2">
-                                <input
-                                    value={fullName}
-                                    onChange={(e) => setFullName(e.target.value)}
-                                    id="fullName"
-                                    name="fullName"
-                                    type="text"
-                                    required
-                                    className="block w-full rounded-md border-0 py-1.5 px-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 dark:bg-gray-200"
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <div className="flex items-center justify-between">
-                                <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                                    Email
-                                </label>
-                            </div>
-                            <div className="mt-2">
-                                <input
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    required
-                                    autoComplete="email"
-                                    className="block w-full rounded-md border-0 py-1.5 p-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 dark:bg-gray-200"
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label htmlFor="userName" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                                User Name
-                            </label>
-                            <div className="mt-2">
-                                <input
-                                    value={userName}
-                                    onChange={(e) => setUserName(e.target.value)}
-                                    id="userName"
-                                    name="userName"
-                                    type="text"
-                                    required
-                                    className="block w-full rounded-md border-0 py-1.5 px-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 dark:bg-gray-200"
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label htmlFor="mobileNumber" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                                Mobile Number
-                            </label>
-                            <div className="mt-2">
-                                <input
-                                    value={mobileNumber}
-                                    onChange={(e) => setMobileNumber(e.target.value)}
-                                    id="mobileNumber"
-                                    name="mobileNumber"
-                                    type="tel"
-                                    required
-                                    maxLength={10}
-                                    className="block w-full rounded-md border-0 py-1.5 px-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 dark:bg-gray-200"
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-                                Password
-                            </label>
-                            <div className="mt-2">
-                                <input
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    required
-                                    className="block w-full rounded-md border-0 py-1.5 px-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 dark:bg-gray-200"
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label
-                                htmlFor="coverImage"
-                                className="block text-sm font-medium leading-6 text-gray-900 dark:text-white"
-                            >
-                                Cover Image
-                            </label>
-                            <div className="mt-2">
-                                <div className="flex items-center">
-                                    <label
-                                        htmlFor="coverImage"
-                                        className="cursor-pointer rounded-md bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                                    >
-                                        Upload Cover Image
-                                    </label>
-                                    {coverImage && (
-                                        <span className="ml-3 text-sm text-gray-600 dark:text-gray-300">
-                                            {coverImage.name}
-                                        </span>
-                                    )}
-                                </div>
-                                <input
-                                    type="file"
-                                    id="coverImage"
-                                    name="coverImage"
-                                    accept="image/*"
-                                    onChange={(e) => setCoverImage(e.target.files[0])}
-                                    className="hidden"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="pb-3">
-                            <button
-                                type="submit"
-                                className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                            >
-                                Sign up
-                            </button>
-                            <p className="mt-3 text-lg text-center">Already a user! <NavLink to={'/login'} className="text-indigo-600">sign in</NavLink></p>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    )
+        </main>
+    );
 }
 
 export default SignUp;

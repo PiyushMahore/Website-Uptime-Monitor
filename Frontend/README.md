@@ -1,8 +1,11 @@
-# React + Vite
+# Website Uptime Monitor frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This frontend is built with React and Vite. It sends API requests to the backend URL configured by `VITE_API_BASE_URL`.
 
-Currently, two official plugins are available:
+## Setup
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1. Install dependencies with `npm install`.
+2. Copy `.env.example` to `.env` and set `VITE_API_BASE_URL` to the backend server's base URL. The default is `http://localhost:5000`.
+3. Start the development server with `npm run dev`, or create a production build with `npm run build`.
+
+The URL may include a path prefix, but should not include the `/api/v1` route prefix. Vite reads environment values at startup/build time, so restart the dev server after changing `.env`.

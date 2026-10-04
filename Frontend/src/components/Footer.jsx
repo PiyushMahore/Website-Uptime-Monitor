@@ -1,44 +1,8 @@
-import React from 'react'
-import { FaGithub } from "react-icons/fa";
-import { FaInstagram } from "react-icons/fa6";
-import { FaLinkedin } from "react-icons/fa";
-import { FaTwitter } from "react-icons/fa";
+import { FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
+import { NavLink } from "react-router-dom";
 
 function Footer() {
-    return (
-        <div className='contact px-[10%] mt-36 dark:bg-[#05050f] bg-gray-200 max-w-screen dark:text-gray-400 text-gray-950 pt-5 pb-4'>
-            <div className='pt-4 pb-2 flex justify-between sm:flex-row flex-col mb-2'>
-                <div className='flex flex-col sm:justify-start text-left w-[30%]'>
-                    <h1 className='text-2xl font-bold dark:text-white text-gray-950 mb-1'>Uptime Moniter</h1>
-                    <p className='text-sm sm:flex hidden'>UpTime Monitor lets you see inside any stack, debug any issue, and resolve any incident.</p>
-                </div>
-                <div className='flex w-full justify-end gap-8 items-end sm:ml-6 text-base'>
-                    <div className='sm:flex hidden gap-4'>
-                        <h3>+91 9131 4835 **</h3>
-                        <h3>hello@uptimemonitor.com</h3>
-                    </div>
-                    <div className='flex gap-4 text-xl'>
-                        <a href='https://github.com/PiyushMahore/Website-Uptime-Monitor'><FaGithub /></a>
-                        <a href='#'><FaInstagram /></a>
-                        <a href='https://www.linkedin.com/in/piyush-mahore-51602a2b1/'><FaLinkedin /></a>
-                        <a href='https://x.com/Piyush_Mahore_'><FaTwitter /></a>
-                    </div>
-                </div>
-            </div>
-            <hr className='border-[0.1px] border-gray-900' />
-            <div className='flex justify-between text-sm dark:text-gray-400 text-gray-950 mt-2'>
-                <div className='flex gap-6'>
-                    <p>terms to use</p>
-                    <p>Privacy Policy</p>
-                    <p>GDPR</p>
-                    <p>System status</p>
-                </div>
-                <div>
-                    <p>© 2024 UpTime Monitor, Inc.</p>
-                </div>
-            </div>
-        </div>
-    )
+    return <footer id="contact" className="site-footer"><div className="page-container"><div className="footer-main"><div className="footer-about"><a href="#home" className="brand"><span className="brand-mark"><span /></span><span>pulse<span className="brand-light">check</span></span></a><p>Less worrying about uptime.<br />More time building what matters.</p></div><div className="footer-links"><div><b>Explore</b><a href="#features">Platform</a><a href="#services">Who it’s for</a><a href="#alerts">Alerts</a></div><div><b>Get started</b><NavLink to="/sign-up">Create account</NavLink><NavLink to="/login">Sign in</NavLink></div><div><b>Follow along</b><a href="https://github.com/PiyushMahore/Website-Uptime-Monitor" target="_blank" rel="noreferrer"><FaGithub /> GitHub</a><a href="https://www.linkedin.com/in/piyush-mahore-51602a2b1/" target="_blank" rel="noreferrer"><FaLinkedin /> LinkedIn</a><a href="https://x.com/Piyush_Mahore_" target="_blank" rel="noreferrer"><FaXTwitter /> X / Twitter</a></div></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} Pulsecheck. Built for a more reliable web.</span><span><i className="live-dot" /> Monitoring the things that matter</span></div></div></footer>;
 }
 
-export default Footer
+export default Footer;
