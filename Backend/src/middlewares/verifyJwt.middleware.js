@@ -4,27 +4,22 @@ import { apiError } from "../utils/apiError.js"
 import { User } from "../models/user.model.js"
 
 const verifyJwt = asyncHandler(async (req, _, next) => {
+    const authorization = req.get("authorization");
+    const bearer = authorization?.match(/^Bearer\s+(.+)$/i)?.[1];
+    const token = req.cookies?.accessToken || bearer;
+    if (!token) throw new apiError(401, "Authentication required");
+
+    let decodedToken;
     try {
-        const token = req.cookies.refreshToken || req.header("Authorization")?.replace("Bearer ", "")
-
-        if (!token) {
-            throw new apiError(404, "Unauthorise request")
-        }
-
-        const decodedToken = jwt.verify(token, process.env.REFRESH_TOKEN)
-
-        const user = await User.findById(decodedToken?._id).select("-password -refreshToken")
-
-        if (!user) {
-            throw new apiError(404, "Invalid token")
-        }
-
-        req.user = user
-        next()
-
-    } catch (error) {
-        throw new apiError(500, error.message || "Somthing went wrong while finding user")
+        decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN, { algorithms: ["HS256"] });
+    } catch {
+        throw new apiError(401, "Invalid or expired access token");
     }
+
+    const user = await User.findById(decodedToken?._id).select("-password -refreshToken");
+    if (!user) throw new apiError(401, "Invalid access token");
+    req.user = user;
+    next();
 })
 
 export default verifyJwt

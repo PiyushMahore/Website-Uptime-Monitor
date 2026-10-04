@@ -1,294 +1,100 @@
+import mongoose from "mongoose";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import { WebUrl } from "../models/webUrl.model.js";
-import mongoose from "mongoose";
-import { User } from "../models/user.model.js";
-import mailAlert from "../utils/emailAlert.js"
 import { fetchUrls } from "../utils/urlFetcher.js";
-import https from 'https';
+import { normalizeMonitorUrl } from "../utils/urlValidation.js";
+import { alertSender } from "../utils/alertSender.js";
+import mailAlert from "../utils/emailAlert.js";
+
+const notificationTypes = new Set(["email"]);
 
 const addWebUrl = asyncHandler(async (req, res) => {
-  const { url, notificationType } = req.body;
+  const { url, notificationType = "email" } = req.body;
+  let normalizedUrl;
+  try { normalizedUrl = normalizeMonitorUrl(url); }
+  catch (error) { throw new apiError(400, error.message); }
+  if (!notificationTypes.has(notificationType)) throw new apiError(400, "Unsupported notification type");
 
-  if (!url || !notificationType) {
-    throw new apiError(400, "Url & notificationType is needed");
+  const duplicate = await WebUrl.exists({ userId: req.user._id, Urls: normalizedUrl });
+  if (duplicate) throw new apiError(409, "This website is already being monitored");
+
+  const website = await WebUrl.create({ Urls: normalizedUrl, notificationType, userId: req.user._id });
+  let initialStatus;
+  try { initialStatus = await fetchUrls(website); }
+  catch (error) { initialStatus = { statusCode: 0, error: error.message, date: new Date(), totalTime: 0 }; }
+  website.statusCode = initialStatus.statusCode;
+  website.statusCodes.push(initialStatus);
+  await website.save();
+  if (initialStatus.statusCode === 0 || initialStatus.statusCode >= 400) {
+    try { await alertSender(website); }
+    catch (error) { console.error("Initial website alert failed:", error.message); }
   }
-
-  const urlValidation =
-    /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[a-zA-Z0-9._~:/?#[\]@!$&'()*+,;=%-]*)?$/;
-
-  const validOrNot = urlValidation.test(url);
-
-  if (validOrNot === false) {
-    throw new apiError(401, "Invalid Url");
-  }
-
-  const webUrl = await WebUrl.create({ Urls: url, notificationType: notificationType, userId: req.user?._id });
-
-  if (!webUrl) {
-    throw new apiError(
-      500,
-      "invalid crediantials or network connection failed"
-    );
-  }
-
-  const webPerformance = await fetchUrls(webUrl);
-
-  if (!webPerformance) {
-    throw new apiError(500, "Somthing wrong with this url")
-  }
-
-  webUrl.statusCode = webPerformance.statusCode
-
-  webUrl.statusCodes.push(webPerformance);
-
-  await webUrl.save({ validateBeforeSave: false })
-
-  return res
-    .status(200)
-    .json(new apiResponse(200, webUrl, "Website added successfully"));
+  return res.status(201).json(new apiResponse(201, website, "Website added successfully"));
 });
 
 const deleteUrl = asyncHandler(async (req, res) => {
-  const { urlId } = req.body;
-
-  if (!urlId) {
-    throw new apiError(404, "urlId is needed");
-  }
-
-  const isExist = await WebUrl.findById({ _id: urlId });
-
-  if (!isExist) {
-    throw new apiError(404, "not found");
-  }
-
-  if (isExist.userId.toString() !== req.user._id.toString()) {
-    throw new apiError(400, "unauthorize request");
-  }
-
-  const deletation = await WebUrl.deleteOne(isExist);
-
-  if (deletation.deletedCount !== 1) {
-    throw new apiError(500, "failed to delete collection");
-  }
-
-  return res
-    .status(200)
-    .json(new apiResponse(200, {}, "collection delete successfully"));
+  const urlId = req.body?.urlId;
+  if (!mongoose.isValidObjectId(urlId)) throw new apiError(400, "A valid urlId is required");
+  const deleted = await WebUrl.findOneAndDelete({ _id: urlId, userId: req.user._id });
+  if (!deleted) throw new apiError(404, "Website not found");
+  return res.status(200).json(new apiResponse(200, {}, "Website removed successfully"));
 });
 
 const editUrl = asyncHandler(async (req, res) => {
   const { newUrl, newNotificationType } = req.body;
-  const { urlId } = req.params;
+  if (!mongoose.isValidObjectId(req.params.urlId)) throw new apiError(400, "A valid urlId is required");
+  if (newUrl === undefined && newNotificationType === undefined) throw new apiError(400, "No changes provided");
+  const website = await WebUrl.findOne({ _id: req.params.urlId, userId: req.user._id });
+  if (!website) throw new apiError(404, "Website not found");
 
-  if (!newUrl && !newNotificationType) {
-    return res
-      .status(200)
-      .json(new apiResponse(200, {}, "Nothing to update"))
+  if (newUrl !== undefined) {
+    try { website.Urls = normalizeMonitorUrl(newUrl); }
+    catch (error) { throw new apiError(400, error.message); }
   }
-
-  if (!urlId) {
-    throw new apiError(400, "urlId is not given");
+  if (newNotificationType !== undefined) {
+    if (!notificationTypes.has(newNotificationType)) throw new apiError(400, "Unsupported notification type");
+    website.notificationType = newNotificationType;
   }
-
-  const urlExist = await WebUrl.findById(urlId);
-
-  if (!urlExist) {
-    throw new apiError(404, "url not found");
-  }
-
-  if (urlExist.userId.toString() !== req.user._id.toString()) {
-    throw new apiError(400, "unauthorize request");
-  }
-
-  if (newUrl) {
-    const urlValidation =
-      /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[a-zA-Z0-9._~:/?#[\]@!$&'()*+,;=%-]*)?$/;
-
-    const validOrNot = urlValidation.test(newUrl);
-
-    if (validOrNot === false) {
-      throw new apiError(401, "Invalid Url");
-    }
-
-    urlExist.Urls = newUrl;
-  }
-
-  if (newNotificationType) {
-    urlExist.notificationType = newNotificationType;
-  }
-
-  await urlExist.save({ validateBeforeSave: false });
-
-  return res
-    .status(200)
-    .json(new apiResponse(200, urlExist, "Url Updated successfully"));
+  await website.save();
+  return res.status(200).json(new apiResponse(200, website, "Website updated successfully"));
 });
 
 const getOneUrl = asyncHandler(async (req, res) => {
-  const { urlId } = req.params
-
-  if (!urlId) {
-    throw new apiError(401, "urlId is required")
-  }
-
-  const url = await WebUrl.findById(urlId);
-
-  if (!url) {
-    throw new apiError(404, "UrlId is not valid")
-  }
-
-  return res
-    .status(200)
-    .json(new apiResponse(200, url, "Url get successfully"))
-})
+  if (!mongoose.isValidObjectId(req.params.urlId)) throw new apiError(400, "A valid urlId is required");
+  const website = await WebUrl.findOne({ _id: req.params.urlId, userId: req.user._id });
+  if (!website) throw new apiError(404, "Website not found");
+  return res.status(200).json(new apiResponse(200, website, "Website fetched successfully"));
+});
 
 const getAllUrls = asyncHandler(async (req, res) => {
-  const urls = await WebUrl.aggregate([
-    {
-      $match: {
-        userId: new mongoose.Types.ObjectId(req.user._id),
-      },
-    },
-    {
-      $lookup: {
-        from: "users",
-        foreignField: "_id",
-        localField: "userId",
-        as: "userAllWebUrls",
-        pipeline: [
-          {
-            $project: {
-              _id: 1,
-              fullName: 1,
-              userName: 1,
-              Urls: 1,
-            },
-          },
-        ],
-      },
-    },
-    {
-      $addFields: {
-        totalWebSites: {
-          $size: "$userAllWebUrls",
-        },
-      },
-    },
-  ]);
-
-  return res
-    .status(200)
-    .json(new apiResponse(200, urls, "All web urls fetched successfully"));
+  const websites = await WebUrl.find({ userId: req.user._id }).sort({ createdAt: -1 }).lean();
+  return res.status(200).json(new apiResponse(200, websites, "Websites fetched successfully"));
 });
 
 const sendAlert = asyncHandler(async (req, res) => {
-  const { urlDesc, message, subject } = req.body;
-
-  if (!urlDesc) {
-    throw new apiError(401, "url desc not provided")
-  }
-
-  const user = await User.findById(urlDesc.userId)
-
-  if (!user) {
-    throw new apiError(404, "cant find user from given user Id")
-  }
-
-  let alert;
-
-  if (urlDesc.notificationType === "email") {
-    alert = await mailAlert(user, subject, message)
-  } else if (urlDesc.notificationType === "text") {
-    console.log("text")
-  } else {
-    console.log("call")
-  }
-
-  if (!alert) {
-    throw new apiError(500, "Somthing went wrong while sending alert")
-  }
-
-  return res
-    .status(200)
-    .json(new apiResponse(200, alert, "Alert send Successfully"))
-})
+  const id = req.body?.urlId || req.body?.urlDesc?._id;
+  if (!mongoose.isValidObjectId(id)) throw new apiError(400, "A valid urlId is required");
+  const website = await WebUrl.findOne({ _id: id, userId: req.user._id });
+  if (!website) throw new apiError(404, "Website not found");
+  const subject = typeof req.body?.subject === "string" ? req.body.subject.trim().slice(0, 160) : "";
+  const message = typeof req.body?.message === "string" ? req.body.message.trim().slice(0, 10_000) : "";
+  if (!subject || !message) throw new apiError(400, "Email subject and message are required");
+  const result = await mailAlert(req.user, subject, message);
+  if (!result) throw new apiError(503, "Notification could not be sent");
+  return res.status(200).json(new apiResponse(200, { messageId: result.messageId }, "Test alert sent"));
+});
 
 const fetchUrl = asyncHandler(async (req, res) => {
-  const { url } = req.body
-
-  if (!url) return null
-
-  new Promise((resolve, reject) => {
-    const timings = {
-      nameLookupTime: 0,
-      connectionTime: 0,
-      tlsHandshakeTime: 0,
-      dataTransferStart: 0,
-      dataTransferTime: 0
-    };
-
-    timings.start = Date.now();
-
-    const request = https.get(url, (response) => {
-      timings.statusCode = response.statusCode;
-
-      response.on('data', () => {
-        if (!timings.dataTransferStart) {
-          timings.dataTransferStart = Date.now();
-        }
-      });
-
-      response.on('end', async () => {
-        timings.responseEnd = Date.now();
-        timings.dataTransferTime = timings.dataTransferStart
-          ? timings.responseEnd - timings.dataTransferStart
-          : 0;
-
-        timings.totalTime = timings.nameLookupTime + timings.connectionTime + timings.tlsHandshakeTime + timings.dataTransferTime;
-
-        const finalTimings = {
-          nameLookupTime: timings.nameLookupTime,
-          connectionTime: timings.connectionTime,
-          tlsHandshakeTime: timings.tlsHandshakeTime,
-          dataTransferTime: timings.dataTransferTime,
-          totalTime: timings.totalTime,
-          statusCode: timings.statusCode
-        };
-
-        resolve(finalTimings);
-      });
-    });
-
-    request.on('socket', (socket) => {
-      socket.on('lookup', () => {
-        timings.nameLookupTime = Date.now() - timings.start;
-      });
-
-      socket.on('connect', () => {
-        timings.connectionTime = Date.now() - timings.nameLookupTime - timings.start;
-      });
-
-      socket.on('secureConnect', () => {
-        timings.tlsHandshakeTime = Date.now() - timings.connectionTime - timings.nameLookupTime - timings.start;
-      });
-    });
-
-    request.on('error', (error) => {
-      reject(new apiError(500, "Failed to fetch the URL"));
-    });
-  })
-    .then((response) => {
-      if (response.statusCode >= 500) {
-        return res.status(200).json(new apiResponse(response.statusCode, response.statusCode, `Your Website is currently Down the Status Code is ${response.statusCode}`))
-      }
-      return res.status(200).json(new apiResponse(response.statusCode, response.statusCode, `Your Website is Perfectly Working With Status Code ${response.statusCode}`))
-    })
-
-    .catch(() => {
-      return res.status(200).json(new apiResponse(200, {}, "Url is invalid or no longer available"))
-    })
-})
+  let url;
+  try { url = normalizeMonitorUrl(req.body?.url); }
+  catch (error) { throw new apiError(400, error.message); }
+  let result;
+  try { result = await fetchUrls(url); }
+  catch (error) { result = { statusCode: 0, error: error.message, date: new Date(), totalTime: 0 }; }
+  const healthy = result.statusCode >= 200 && result.statusCode < 400;
+  return res.status(200).json(new apiResponse(200, result, healthy ? "Website is responding" : "Website is unavailable"));
+});
 
 export { addWebUrl, deleteUrl, editUrl, getAllUrls, getOneUrl, sendAlert, fetchUrl };

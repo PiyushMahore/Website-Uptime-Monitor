@@ -1,31 +1,17 @@
-import { User } from "../models/user.model.js"
-import { apiError } from "./apiError.js"
-import mailAlert from "./emailAlert.js"
+import { User } from "../models/user.model.js";
+import { apiError } from "./apiError.js";
+import mailAlert from "./emailAlert.js";
 
-const alertSender = async (receiversdata) => {
-
-    if (!receiversdata) {
-        throw new apiError(404, "recervers data not reseved")
+export async function alertSender(website, { recovered = false } = {}) {
+    if (!website?.userId) throw new apiError(400, "Website is missing an owner");
+    const user = await User.findById(website.userId);
+    if (!user) throw new apiError(404, "Website owner not found");
+    if (website.notificationType !== "email") {
+        throw new apiError(501, `The ${website.notificationType} notification channel is not configured`);
     }
-
-    const user = await User.findById(receiversdata.userId)
-
-    if (!user) {
-        throw new apiError(404, "cant find user from given user Id")
-    }
-
-    let alert;
-
-    if (receiversdata.notificationType === "email") {
-        alert = await mailAlert(user, "Alert: Immediate Attention Required", `Hii ${user.fullName},\n\nWe have detected that your website is currently not responding. This may impact user access and disrupt normal operations. Please look into the issue at your earliest convenience to restore full functionality.\n\nBest regards,\nYour Monitoring System\npiyushmahore41@gmail.com`);
-    }
-    else if (receiversdata.notificationType === "text") {
-        console.log("text")
-    } else {
-        console.log("call")
-    }
-
-    return alert
+    const subject = recovered ? "Website is back online" : "Website unavailable";
+    const message = recovered
+        ? `Hi ${user.fullName},\n\n${website.Urls} is responding again (HTTP ${website.statusCode}).\n\nUptime Monitor`
+        : `Hi ${user.fullName},\n\nWe detected that ${website.Urls} is unavailable (HTTP ${website.statusCode || 0}). Please check the website.\n\nUptime Monitor`;
+    return mailAlert(user, subject, message);
 }
-
-export { alertSender }

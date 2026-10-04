@@ -4,18 +4,20 @@ import { addWebUrl, deleteUrl, editUrl, fetchUrl, getAllUrls, getOneUrl, sendAle
 
 const webUrlRoute = Router()
 
-webUrlRoute.route('/add-website-url').post(verifyJwt, addWebUrl)
+webUrlRoute.route('/check-url').post(fetchUrl)
+webUrlRoute.use(verifyJwt)
 
-webUrlRoute.route('/remove-website-url').delete(verifyJwt, deleteUrl)
+webUrlRoute.route('/add-website-url').post(addWebUrl)
 
-webUrlRoute.route('/edit-website-url/:urlId').patch(verifyJwt, editUrl)
+webUrlRoute.route('/remove-website-url').delete(deleteUrl)
 
-webUrlRoute.route('/get-website-url').get(verifyJwt, getAllUrls)
+webUrlRoute.route('/edit-website-url/:urlId').patch(editUrl)
+
+webUrlRoute.route('/get-website-url').get(getAllUrls)
 
 webUrlRoute.route('/get-single-url/:urlId').get(getOneUrl)
 
 webUrlRoute.route('/send-url-alert').post(sendAlert)
 
-webUrlRoute.route('/check-url').post(fetchUrl)
 
 export { webUrlRoute }

@@ -1,39 +1,33 @@
 import { fetchUrls } from "./urlFetcher.js";
 import { alertSender } from "./alertSender.js";
 import { WebUrl } from "../models/webUrl.model.js";
-import { apiError } from "./apiError.js";
-import { apiResponse } from "./apiResponse.js";
 
-const checkUrls = async (urlDesc) => {
-    if (!urlDesc) {
-        throw new apiError(401, "no url to check")
+export async function checkUrls(urlDescription) {
+  let result;
+  try {
+    result = await fetchUrls(urlDescription);
+  } catch (error) {
+    result = { statusCode: 0, error: error.message, date: new Date(), totalTime: 0 };
+  }
+  const previousStatus = Number(urlDescription.statusCode || 0);
+  const isDown = result.statusCode === 0 || result.statusCode >= 400;
+  const hasPreviousCheck = Boolean(urlDescription.statusCodes?.length);
+  const wasDown = hasPreviousCheck && (previousStatus === 0 || previousStatus >= 400);
+  const wentDown = isDown && !wasDown;
+  const recovered = wasDown && !isDown;
+  const update = {
+    $set: { statusCode: result.statusCode },
+    $push: { statusCodes: { $each: [result], $slice: -480 } },
+  };
+  if (wentDown) update.$inc = { incidents: 1 };
+
+  const saved = await WebUrl.findByIdAndUpdate(urlDescription._id, update, { new: true, runValidators: true });
+  if (saved && (wentDown || recovered)) {
+    try {
+      await alertSender(saved, { recovered });
+    } catch (error) {
+      console.error("Website down notification failed:", error.message);
     }
-
-    const isExist = await WebUrl.findById(urlDesc._id);
-
-    if (!isExist) {
-        throw new apiError(404, "given url is not valid")
-    }
-
-    const urlCheck = await fetchUrls(urlDesc);
-
-    if (isExist.statusCodes.length >= 480) {
-        isExist.statusCodes.splice(0, 10);
-    }
-
-    isExist.statusCodes.push(urlCheck);
-
-    await isExist.save({ validateBeforeSave: true });
-
-    if (urlCheck.statusCode >= 400) {
-        const alertSend = await alertSender(urlDesc)
-        if (!alertSend?.messageId) {
-            throw new apiError(500, "failed to send notification")
-        }
-        return new apiResponse(200, { urlstatus: urlCheck }, `your webisite is not working with status code ${urlCheck.statusCode} we have alerted to the owner of website`)
-    }
-
-    return new apiResponse(200, { urlstatus: urlCheck }, `your webisite is perfectly working with status code ${urlCheck.statusCode}`)
+  }
+  return result;
 }
-
-export { checkUrls }

@@ -1,14 +1,18 @@
 import mongoose from "mongoose";
-import { db_Name } from "../constant.js"
+import { env } from "../config/env.js";
 
-const dbConnect = async() => {
-    try {
-        const file = await mongoose.connect(`${process.env.DB_URL}/${db_Name}`)
-        console.log("database connected sucessfully", file.connection.name);
-    } catch (error) {
-        console.log("somthing went wrong while connecting database", error);
-        process.exit(1)
+const dbConnect = async () => {
+    if (!env.dbUrl) throw new Error("DB_URL is required");
+    const connectionUrl = new URL(env.dbUrl);
+    if (!connectionUrl.pathname || connectionUrl.pathname === "/") {
+        connectionUrl.pathname = `/${encodeURIComponent(env.dbName)}`;
     }
+    const connection = await mongoose.connect(connectionUrl.toString(), {
+        serverSelectionTimeoutMS: Number(process.env.DB_CONNECT_TIMEOUT_MS || 10_000),
+        autoIndex: env.nodeEnv !== "production",
+    });
+    console.log("Database connected:", connection.connection.name);
+    return connection;
 }
 
 export default dbConnect
